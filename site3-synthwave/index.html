@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#101311" />
+    <title>RETRO TANKS — One more round</title>
+    <meta
+      name="description"
+      content="Play a free browser tank arcade. Four maps, three difficulty levels, touch controls, and an 8-bit sound lab."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="base.css" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="wrap nav">
+      <a class="brand" href="#" aria-label="Home"
+        ><span class="brand-mark">▦</span> RETRO TANKS<span class="edition"
+          >/ 1990</span
+        ></a
+      >
+      <nav class="nav-links" id="navigation" aria-label="Main navigation">
+        <a href="#synth-3d">Play arcade</a><a href="#how-to">How to play</a
+        ><a href="#audio-lab">Sound lab</a>
+      </nav>
+      <button
+        class="menu-toggle"
+        aria-expanded="false"
+        aria-controls="navigation"
+      >
+        Menu +</button
+      ><button class="button" onclick="startGame()">
+        Insert coin <span>＋</span>
+      </button>
+    </header>
+    <main id="main">
+      <section class="synth-hero">
+        <div class="wrap hero-layout">
+          <div class="hero-retro-content">
+            <p class="eyebrow entrance">
+              <span class="tiny-star">✦</span> No downloads. Just one more
+              round.
+            </p>
+            <h1 class="entrance delay">
+              RETRO<br /><span>TANKS</span><sup>®</sup>
+            </h1>
+            <p class="retro-p entrance delay">
+              Small tank. Big mission.<br />Defend your base. Make arcade
+              history.
+            </p>
+            <div class="hero-actions entrance delay">
+              <button class="button" onclick="startGame()">
+                Let’s play <span>↗</span></button
+              ><a class="text-link" href="#how-to">Learn the controls ↓</a>
+            </div>
+            <div class="hero-meta">
+              <span>04 MAPS</span><span>03 LEVELS</span
+              ><span>100% 8-BIT ENERGY</span>
+            </div>
+          </div>
+          <div class="tank-art entrance" aria-hidden="true">
+            <span class="art-coordinate">P1 / READY FOR ACTION</span
+            ><svg viewBox="0 0 520 450" role="presentation">
+              <defs>
+                <pattern
+                  id="grid"
+                  width="40"
+                  height="40"
+                  patternUnits="userSpaceOnUse"
+                >
+                  <path
+                    d="M 40 0 L 0 0 0 40"
+                    fill="none"
+                    stroke="#c4bbe4"
+                    stroke-width="1"
+                  />
+                </pattern>
+              </defs>
+              <rect width="520" height="450" fill="url(#grid)" />
+              <circle cx="260" cy="225" r="165" fill="#b7fa6d" />
+              <g transform="translate(160 110) rotate(-12 100 110)">
+                <path d="M0 45h40v190H0zM160 45h40v190h-40z" fill="#25203b" />
+                <path
+                  d="M8 55h24v15H8zm0 35h24v15H8zm0 35h24v15H8zm0 35h24v15H8zm0 35h24v15H8zM168 55h24v15h-24zm0 35h24v15h-24zm0 35h24v15h-24zm0 35h24v15h-24zm0 35h24v15h-24z"
+                  fill="#746a99"
+                />
+                <path d="M40 60h120v160H40z" fill="#6650c8" />
+                <path d="M40 60h120v22H40zM40 82h20v138H40z" fill="#a995f3" />
+                <path d="M68 112h64v65H68z" fill="#25203b" />
+                <path d="M78 104h54v55H78z" fill="#b7fa6d" />
+                <path d="M91 0h22v120H91z" fill="#25203b" />
+                <path d="M91 0h10v104H91z" fill="#f8f6ec" />
+                <path d="M85 0h34v18H85z" fill="#25203b" />
+                <path d="M76 189h48v12H76z" fill="#a995f3" />
+              </g>
+              <path
+                d="M400 70h10v-10h10v10h10v10h-10v10h-10V80h-10zM90 310h10v-10h10v10h10v10h-10v10h-10v-10H90z"
+                fill="#6650c8"
+              /></svg
+            ><span class="art-label">BUILT FOR<br />ONE MORE TRY.</span
+            ><span class="art-sticker">PLAY<br />FREE ↗</span>
+          </div>
+        </div>
+      </section>
+      <div class="marquee">
+        <span>DEFEND THE BASE</span><span>✦</span
+        ><span>CHASE THE HIGH SCORE</span><span>✦</span
+        ><span>KEEP THE ARCADE ALIVE</span><span>✦</span>
+      </div>
+      <section class="section-3d-arcade wrap" id="synth-3d">
+        <div class="section-top reveal">
+          <div>
+            <p class="eyebrow">The arcade / 01</p>
+            <h2>Your next high score<br />starts here.</h2>
+          </div>
+          <p>Four battlefields. One eagle base.<br />Ready when you are.</p>
+        </div>
+        <div class="arcade-cabinet-frame">
+          <div class="game-screen">
+            <div class="screen-top">
+              <span><i class="status-dot"></i> BATTLE TANKS / P1</span
+              ><span id="game-lives-val">3 LIVES</span>
+            </div>
+            <div class="canvas-wrapper">
+              <canvas
+                id="synthwave-canvas"
+                tabindex="0"
+                aria-label="Tank battlefield. Use arrow keys or WASD to move and Space to shoot."
+              ></canvas>
+              <div class="game-overlay" id="game-overlay">
+                <span class="eyebrow">PLAYER ONE</span>
+                <h3 id="game-message">Ready, commander?</h3>
+                <p id="game-message-detail">Your base needs a hero.</p>
+                <button class="button" id="game-start" onclick="startGame()">
+                  Start game ↗
+                </button>
+              </div>
+            </div>
+            <div class="screen-bottom">
+              <span>WASD / ARROWS — MOVE</span><span>SPACE — FIRE</span>
+            </div>
+          </div>
+          <div class="cabinet-side-panel">
+            <div class="hud-panel">
+              <div class="hud-item">
+                <span>ROUND</span><strong id="game-round-val">1 / 4</strong>
+              </div>
+              <div class="hud-item">
+                <span>SCORE</span><strong id="game-score-val">0</strong>
+              </div>
+              <div class="hud-item">
+                <span>BASE</span><strong id="game-base-status">SECURE</strong>
+              </div>
+              <div class="hud-item">
+                <span>LEVEL</span><strong id="game-diff-label">EASY</strong>
+              </div>
+            </div>
+            <div class="opt-block">
+              <label>DIFFICULTY</label>
+              <div class="btn-group">
+                <button
+                  class="diff-btn active"
+                  aria-pressed="true"
+                  onclick="setDifficulty('easy')"
+                >
+                  Easy</button
+                ><button
+                  class="diff-btn"
+                  aria-pressed="false"
+                  onclick="setDifficulty('medium')"
+                >
+                  Medium</button
+                ><button
+                  class="diff-btn"
+                  aria-pressed="false"
+                  onclick="setDifficulty('hard')"
+                >
+                  Hard
+                </button>
+              </div>
+            </div>
+            <div class="opt-block">
+              <label>BATTLEFIELD</label>
+              <div class="btn-group">
+                <button
+                  class="round-btn active"
+                  aria-pressed="true"
+                  onclick="selectRound(1)"
+                >
+                  01</button
+                ><button
+                  class="round-btn"
+                  aria-pressed="false"
+                  onclick="selectRound(2)"
+                >
+                  02</button
+                ><button
+                  class="round-btn"
+                  aria-pressed="false"
+                  onclick="selectRound(3)"
+                >
+                  03</button
+                ><button
+                  class="round-btn"
+                  aria-pressed="false"
+                  onclick="selectRound(4)"
+                >
+                  04
+                </button>
+              </div>
+            </div>
+            <div class="dpad-panel" aria-label="Touch game controls">
+              <button class="dpad-btn up" id="btn-up" aria-label="Move up">
+                ↑</button
+              ><button
+                class="dpad-btn left"
+                id="btn-left"
+                aria-label="Move left"
+              >
+                ←</button
+              ><button
+                class="dpad-btn down"
+                id="btn-down"
+                aria-label="Move down"
+              >
+                ↓</button
+              ><button
+                class="dpad-btn right"
+                id="btn-right"
+                aria-label="Move right"
+              >
+                →</button
+              ><button class="dpad-btn fire-btn" id="btn-fire">FIRE</button>
+            </div>
+            <div class="game-actions">
+              <button
+                id="pause-game"
+                class="pause-btn"
+                onclick="togglePause()"
+                disabled
+              >
+                Pause Ⅱ</button
+              ><button class="pause-btn" onclick="restartGame()">
+                Restart ↺
+              </button>
+            </div>
+            <p class="game-note">
+              Click the battlefield to use keyboard controls. Progress lasts for
+              this session.
+            </p>
+          </div>
+        </div>
+      </section>
+      <section class="how-section wrap" id="how-to">
+        <div class="section-top reveal">
+          <div>
+            <p class="eyebrow">Field manual / 02</p>
+            <h2>Old-school rules.<br />Instant obsession.</h2>
+          </div>
+        </div>
+        <div class="rules">
+          <article class="reveal">
+            <span class="rule-number">01</span>
+            <h3>Find your way.</h3>
+            <p>
+              Move with WASD, arrow keys or the touch pad. Brick walls break;
+              steel holds strong.
+            </p>
+          </article>
+          <article class="reveal">
+            <span class="rule-number">02</span>
+            <h3>Make every shot count.</h3>
+            <p>
+              Press Space or Fire to take out enemy tanks. Clear each wave to
+              unlock the next round.
+            </p>
+          </article>
+          <article class="reveal">
+            <span class="rule-number">03</span>
+            <h3>Protect the eagle.</h3>
+            <p>
+              Keep your base safe and your three lives intact. Lose either and
+              it’s time for one more try.
+            </p>
+          </article>
+        </div>
+      </section>
+      <section class="audio-lab-section" id="audio-lab">
+        <div class="wrap">
+          <div class="section-top reveal">
+            <div>
+              <p class="eyebrow">Sound lab / 03</p>
+              <h2>Sounds like 1990.</h2>
+            </div>
+            <p>
+              Six pads. Pure nostalgia.<br />Tap a note and make some noise.
+            </p>
+          </div>
+          <div class="synth-pad-container">
+            <button
+              class="synth-pad"
+              onclick="
+                play8BitSound(261.63, 'square');
+                flashPad(this);
+              "
+            >
+              <span>01</span><strong>C4</strong><span>261 Hz ↗</span></button
+            ><button
+              class="synth-pad"
+              onclick="
+                play8BitSound(329.63, 'square');
+                flashPad(this);
+              "
+            >
+              <span>02</span><strong>E4</strong><span>330 Hz ↗</span></button
+            ><button
+              class="synth-pad"
+              onclick="
+                play8BitSound(392, 'square');
+                flashPad(this);
+              "
+            >
+              <span>03</span><strong>G4</strong><span>392 Hz ↗</span></button
+            ><button
+              class="synth-pad"
+              onclick="
+                play8BitSound(523.25, 'sawtooth');
+                flashPad(this);
+              "
+            >
+              <span>04</span><strong>C5</strong><span>523 Hz ↗</span></button
+            ><button
+              class="synth-pad"
+              onclick="
+                playLaserSound();
+                flashPad(this);
+              "
+            >
+              <span>05</span><strong>PEW</strong><span>Shell ↗</span></button
+            ><button
+              class="synth-pad"
+              onclick="
+                playExplosionSound();
+                flashPad(this);
+              "
+            >
+              <span>06</span><strong>BOOM</strong><span>Explosion ↗</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="wrap foot">
+      <span>▦ RETRO TANKS / 1990</span
+      ><span>No coins required. Keep the arcade alive.</span
+      ><span>© 2026 Retro Tanks</span>
+    </footer>
+    <div class="toast" role="status" aria-live="polite"></div>
+    <script src="ui.js"></script>
+    <script src="main.js"></script>
+    <script src="3d-arcade.js"></script>
+  </body>
+</html>

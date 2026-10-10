@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#f5f1e9" />
+    <title>KAIROS — Соберите свой загородный дом</title>
+    <meta
+      name="description"
+      content="Выберите сценарий жизни, площадь, этажность и материал. Сравните концепты загородного дома с вашим бюджетом и сохраните эскиз."
+    />
+
+    <link rel="stylesheet" href="assets/fonts/fonts.css" />
+    <link rel="stylesheet" href="base.css" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Перейти к содержимому</a>
+    <header class="nav wrap">
+      <a class="brand" href="#"
+        >KAIROS<span class="brand-sub">СТУДИЯ ЗАГОРОДНОЙ ЖИЗНИ</span></a
+      >
+      <nav class="nav-links" id="navigation" aria-label="Навигация">
+        <a href="#inspiration">Сценарии жизни</a
+        ><a href="#cad-studio">Мой дом</a
+        ><a href="#compare">Сравнить варианты</a>
+      </nav>
+      <button
+        class="menu-toggle"
+        aria-expanded="false"
+        aria-controls="navigation"
+      >
+        Меню +</button
+      ><a class="button outline" href="#cad-studio">Собрать дом ↗</a>
+    </header>
+    <main id="main">
+      <section class="hero">
+        <img
+          class="hero-photo"
+          src="assets/villa.jpg"
+          alt="Загородный дом с тёплыми деревянными фасадами и выходом в сад"
+          fetchpriority="high"
+        />
+        <div class="hero-overlay"></div>
+        <div class="wrap hero-text">
+          <p class="eyebrow entrance">Сначала — как ты хочешь жить</p>
+          <h1 class="entrance delay">KAIROS</h1>
+          <h2 class="entrance delay">Дом начинается<br />с твоего дня.</h2>
+          <p class="hero-description entrance delay">
+            Выбери, что важно: тихие выходные, большая семья или гости. Собери
+            свой вариант и посмотри, как он вписывается в бюджет.
+          </p>
+          <a class="button entrance delay" href="#cad-studio"
+            >Представить свой дом <span>↗</span></a
+          >
+        </div>
+        <div class="hero-bottom wrap">
+          <span>ОТ ИДЕИ К ПОНЯТНОМУ ЭСКИЗУ</span
+          ><span>ПЛАН · МАТЕРИАЛЫ · СРАВНЕНИЕ</span
+          ><a href="#inspiration" aria-label="Перейти к сценариям жизни">↓</a>
+        </div>
+      </section>
+      <section class="inspiration wrap" id="inspiration">
+        <div class="section-top reveal">
+          <div>
+            <p class="eyebrow">01 / Сценарии жизни</p>
+            <h2>У каждого дома<br />свой ритм.</h2>
+          </div>
+          <p>
+            Начни с готового сценария. Дальше меняй площадь, материал и
+            этажность под себя.
+          </p>
+        </div>
+        <div class="lifestyle-grid">
+          <button class="lifestyle reveal" data-preset="weekend">
+            <div class="lifestyle-image">
+              <img
+                src="assets/interior.jpg"
+                alt="Светлая гостиная для спокойных выходных"
+                loading="lazy"
+              /><span>01 / ДЛЯ ДВОИХ</span>
+            </div>
+            <div class="lifestyle-title">
+              <h3>Уехать в тишину.</h3>
+              <span>↗</span>
+            </div>
+            <p>90 м² · одна спальня · всё на одном уровне</p></button
+          ><button class="lifestyle reveal" data-preset="family">
+            <div class="lifestyle-image">
+              <img
+                src="assets/villa.jpg"
+                alt="Просторный дом с выходом в семейный сад"
+                loading="lazy"
+              /><span>02 / ДЛЯ СЕМЬИ</span>
+            </div>
+            <div class="lifestyle-title">
+              <h3>Место для каждого.</h3>
+              <span>↗</span>
+            </div>
+            <p>160 м² · три спальни · два этажа</p></button
+          ><button class="lifestyle reveal" data-preset="friends">
+            <div class="lifestyle-image">
+              <img
+                src="assets/interior.jpg"
+                alt="Открытая гостиная для встречи с друзьями"
+                loading="lazy"
+              /><span>03 / ДЛЯ ВСТРЕЧ</span>
+            </div>
+            <div class="lifestyle-title">
+              <h3>Собирать своих.</h3>
+              <span>↗</span>
+            </div>
+            <p>200 м² · три спальни · большая гостиная</p>
+          </button>
+        </div>
+      </section>
+      <section class="studio-section" id="cad-studio">
+        <div class="wrap">
+          <div class="section-top reveal">
+            <div>
+              <p class="eyebrow">02 / Мой дом</p>
+              <h2>Твоя жизнь.<br />Твой план.</h2>
+            </div>
+            <p>
+              Эскиз меняется вместе с твоими решениями. Сохрани два варианта,
+              чтобы увидеть разницу.
+            </p>
+          </div>
+          <div class="studio-layout">
+            <div class="drawing-stage">
+              <div class="drawing-toolbar">
+                <span id="drawing-title">ДОМ ДЛЯ ДВОИХ / 90 М²</span>
+                <div class="view-switch">
+                  <button
+                    class="view-btn active"
+                    data-view="plan"
+                    aria-pressed="true"
+                  >
+                    План</button
+                  ><button
+                    class="view-btn"
+                    data-view="volume"
+                    aria-pressed="false"
+                  >
+                    Экстерьер
+                  </button>
+                </div>
+              </div>
+              <canvas
+                id="architecture-canvas"
+                aria-label="Эскиз плана дома. Состав помещений указан под чертежом."
+                tabindex="0"
+              ></canvas
+              ><canvas
+                id="exterior-canvas"
+                hidden
+                tabindex="0"
+                aria-label="Объёмная модель дома. Стрелки поворачивают, плюс и минус приближают."
+              ></canvas>
+              <p id="exterior-help" hidden>
+                Потяни для поворота · колесо для масштаба · стрелки и + / − с
+                клавиатуры
+              </p>
+              <div class="drawing-footer">
+                <span id="drawing-caption">1 этаж · 90 м²</span
+                ><span>ЭСКИЗ / НЕ СТРОИТЕЛЬНЫЙ ЧЕРТЁЖ</span>
+              </div>
+              <div
+                class="room-program"
+                id="room-program"
+                aria-live="polite"
+              ></div>
+            </div>
+            <div class="studio-controls">
+              <details class="editor-panel">
+                <summary>Редактор комнат</summary>
+                <p>
+                  Нажми сектор на плане или выбери комнату. Перегородка меняет
+                  два соседних сектора, сохраняя площадь. Объединение заменяет
+                  обе ветви соседнего блока.
+                </p>
+                <label for="room-select">Сектор текущего этажа</label
+                ><select id="room-select"></select
+                ><label for="room-name">Название</label
+                ><input id="room-name" maxlength="40" /><label for="room-type"
+                  >Назначение</label
+                ><select id="room-type">
+                  <option value="living">Гостиная</option>
+                  <option value="kitchen">Кухня</option>
+                  <option value="bedroom">Спальня</option>
+                  <option value="bath">Санузел</option>
+                  <option value="hall">Холл / проход</option></select
+                ><label for="room-ratio"
+                  >Положение общей перегородки
+                  <output id="room-ratio-value"></output></label
+                ><input type="range" id="room-ratio" min="15" max="85" /><label
+                  for="split-axis"
+                  >Направление новой перегородки</label
+                ><select id="split-axis">
+                  <option value="x">Вертикально на плане</option>
+                  <option value="y">Горизонтально на плане</option>
+                </select>
+                <div class="editor-actions">
+                  <button id="split-room">Разделить сектор</button
+                  ><button id="merge-room">Объединить блок</button>
+                </div>
+              </details>
+              <details class="editor-panel" open>
+                <summary>Внешний фасад</summary>
+                <label for="facade-side">Сторона дома</label
+                ><select id="facade-side">
+                  <option value="front">Главный фасад</option>
+                  <option value="side">Правый</option>
+                  <option value="rear">Задний</option>
+                  <option value="left">Левый</option></select
+                ><label for="facade-material">Отделка выбранной стороны</label
+                ><select id="facade-material">
+                  <option value="timber">Дерево</option>
+                  <option value="concrete">Штукатурка</option>
+                  <option value="brick">Кирпич</option></select
+                ><label for="facade-color">Тон фасада</label
+                ><input id="facade-color" type="color" /><label
+                  for="facade-roof"
+                  >Крыша</label
+                ><select id="facade-roof">
+                  <option value="gable">Скатная</option>
+                  <option value="flat">Плоская</option></select
+                ><label for="facade-roofColor">Цвет кровли</label
+                ><input id="facade-roofColor" type="color" /><label
+                  for="facade-windows"
+                  >Остекление</label
+                ><select id="facade-windows">
+                  <option value="wide">Панорамное</option>
+                  <option value="regular">Сдержанное</option></select
+                ><label class="editor-check"
+                  ><input type="checkbox" id="facade-terrace" /> Терраса перед
+                  домом</label
+                >
+                <p>
+                  Отделка каждой стороны независима. Тон, крыша и остекление
+                  относятся ко всему дому. Окна следуют секторам плана.
+                </p>
+              </details>
+              <details class="editor-panel" open>
+                <summary>Готовые проекты · 6 вариантов</summary>
+                <p>Выбери основу, затем настрой план и внешний вид.</p>
+                <div id="ready-projects"></div>
+              </details>
+              <div class="control-group">
+                <label for="lifestyle-select">Как ты хочешь жить?</label
+                ><select id="lifestyle-select">
+                  <option value="weekend">Тихие выходные вдвоём</option>
+                  <option value="family">Дом для семьи</option>
+                  <option value="friends">Дом для встреч с друзьями</option>
+                </select>
+              </div>
+              <div class="control-group">
+                <div class="range-label">
+                  <label for="area-range">Общая площадь</label
+                  ><output id="area-value" for="area-range">90 м²</output>
+                </div>
+                <input
+                  id="area-range"
+                  type="range"
+                  min="70"
+                  max="240"
+                  step="10"
+                  value="90"
+                />
+                <div class="range-limits">
+                  <span>70 м²</span><span>240 м²</span>
+                </div>
+              </div>
+              <div class="control-group">
+                <label>Этажность</label>
+                <div class="floor-selector">
+                  <button
+                    class="floor-btn active"
+                    data-floors="1"
+                    aria-pressed="true"
+                  >
+                    Один этаж</button
+                  ><button
+                    class="floor-btn"
+                    data-floors="2"
+                    aria-pressed="false"
+                  >
+                    Два этажа
+                  </button>
+                </div>
+              </div>
+              <div class="control-group">
+                <label>Основной материал</label>
+                <div class="materials">
+                  <button
+                    class="material-btn active"
+                    data-mat="timber"
+                    aria-pressed="true"
+                  >
+                    <i class="swatch timber"></i> Дерево
+                    <span>Тёплый характер</span></button
+                  ><button
+                    class="material-btn"
+                    data-mat="concrete"
+                    aria-pressed="false"
+                  >
+                    <i class="swatch concrete"></i> Минеральный
+                    <span>Сдержанный ритм</span></button
+                  ><button
+                    class="material-btn"
+                    data-mat="brick"
+                    aria-pressed="false"
+                  >
+                    <i class="swatch brick"></i> Кирпич
+                    <span>Выразительная фактура</span>
+                  </button>
+                </div>
+              </div>
+              <div class="control-group">
+                <label for="budget-range">Мой бюджет</label>
+                <div class="range-label">
+                  <output id="budget-value" for="budget-range">18 млн ₽</output
+                  ><span>на концепт дома</span>
+                </div>
+                <input
+                  id="budget-range"
+                  type="range"
+                  min="8"
+                  max="50"
+                  step="1"
+                  value="18"
+                />
+              </div>
+              <div class="estimate" aria-live="polite">
+                <span>Ориентир модели</span><strong id="calc-cost"></strong>
+                <p id="budget-status"></p>
+                <p class="estimate-note">
+                  Условные ставки площади и основного материала; детали крыши,
+                  террасы и отделки сторон не учтены. Без участка, мебели,
+                  инженерии и местных поправок.
+                </p>
+              </div>
+              <button class="button" id="save-variant">
+                Сохранить вариант <span>＋</span>
+              </button>
+              <p class="saved-status" id="saved-status" role="status"></p>
+            </div>
+          </div>
+          <div class="design-advice">
+            <span>Почему так?</span>
+            <p id="design-advice"></p>
+          </div>
+        </div>
+      </section>
+      <section class="compare-section wrap" id="compare">
+        <div class="section-top reveal">
+          <div>
+            <p class="eyebrow">03 / Выбрать осознанно</p>
+            <h2>Что меняется,<br />если попробовать иначе?</h2>
+          </div>
+          <p>
+            Сравни до трёх вариантов. Они останутся в этом браузере, чтобы можно
+            было вернуться к выбору.
+          </p>
+        </div>
+        <div class="compare-empty" id="compare-empty">
+          <span aria-hidden="true">＋</span>
+          <p>Пока здесь чистый лист.</p>
+          <small>Сохрани свой первый вариант в студии выше.</small
+          ><a class="text-link" href="#cad-studio">Вернуться к моему дому ↑</a>
+        </div>
+        <div id="comparison" hidden>
+          <div class="comparison-scroll">
+            <table class="comparison-table" id="comparison-table"></table>
+          </div>
+          <button class="button" id="download-brief">
+            Скачать варианты и задание архитектору <span>↓</span>
+          </button>
+          <p class="download-note">
+            Текстовый файл с параметрами, составом помещений и вопросами для
+            следующего шага.
+          </p>
+        </div>
+      </section>
+      <section class="next-section">
+        <div class="wrap next-layout">
+          <img
+            src="assets/interior.jpg"
+            alt="Естественный свет в современной гостиной"
+            loading="lazy"
+          />
+          <div class="reveal">
+            <p class="eyebrow">Что дальше</p>
+            <h2>Хороший разговор<br />начинается с деталей.</h2>
+            <p>
+              Твой эскиз помогает сформулировать желания. Перед проектированием
+              архитектор проверит участок, ориентацию по солнцу, конструкцию и
+              реальный состав работ.
+            </p>
+            <a class="text-link" href="#compare"
+              >Собрать задание архитектору ↗</a
+            >
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="wrap foot">
+      <span>KAIROS / СТУДИЯ ЗАГОРОДНОЙ ЖИЗНИ</span
+      ><span>От желания к осмысленному выбору</span><span>© 2026</span>
+    </footer>
+    <div class="toast" role="status" aria-live="polite"></div>
+    <script src="ui.js"></script>
+    <script src="three.min.js"></script>
+    <script src="3d-pavilion.js"></script>
+    <script src="house-editor.js"></script>
+    <script src="exterior.js"></script>
+    <script src="main.js"></script>
+  </body>
+</html>
