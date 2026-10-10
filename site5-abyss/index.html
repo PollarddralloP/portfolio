@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="description"
+      content="ABYSS — интерактивная подводная экспедиция. Прокрутка управляет погружением; действия сохраняются в журнале."
+    />
+    <title>ABYSS — ниже поверхности</title>
+    <link rel="stylesheet" href="../shared/fonts/fonts.css" />
+    <link rel="stylesheet" href="../shared/common.css" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip" href="#mission">Перейти к экспедиции</a>
+    <header class="site-header">
+      <a class="brand" href="../"
+        >ABYSS<span class="mono"> / EXPEDITION 07</span></a
+      >
+      <nav><a href="#journal">Журнал</a><a href="../">Портфолио ↗</a></nav>
+    </header>
+    <main>
+      <section id="mission" class="story">
+        <div class="story-viewport">
+          <div class="ocean-scene">
+            <canvas
+              id="ocean-canvas"
+              aria-label="Подводный аппарат и рельеф океана. Сцена меняется при прокрутке."
+            ></canvas>
+            <div class="renderer-fallback" hidden>
+              <svg
+                viewBox="0 0 800 600"
+                role="img"
+                aria-label="Рисунок подводного аппарата"
+              >
+                <g fill="none" stroke="#b1d4db" stroke-width="2">
+                  <path
+                    d="M380 150h80v50h-80zm40 0v-40m-120 180h240m-250 110h270M190 480l80-80 110 70 100-55 100 85"
+                  />
+                  <ellipse
+                    cx="420"
+                    cy="310"
+                    rx="150"
+                    ry="95"
+                    fill="#d4bb49"
+                    stroke="#e4d384"
+                  />
+                  <circle cx="510" cy="300" r="55" fill="#153d4c" />
+                  <path d="m500 370 100 130m-190-135L280 510" opacity=".3" />
+                </g>
+              </svg>
+              <p class="fallback-note">
+                Показан рисунок аппарата. Маршрут и журнал доступны без WebGL.
+              </p>
+            </div>
+          </div>
+          <div class="chapter-copy">
+            <span class="eyebrow entrance"
+              >ВЫМЫШЛЕННАЯ ЭКСПЕДИЦИЯ / 5 ЭТАПОВ</span
+            >
+            <h1 class="entrance delay">ABYSS</h1>
+            <div class="chapter-text" id="chapter-text">
+              <span class="mono" id="chapter-number">01 / ПОВЕРХНОСТЬ</span>
+              <h2 id="chapter-title">Вниз,<br />к невидимому.</h2>
+              <p id="chapter-description">
+                Один аппарат, пять остановок. Прокрути страницу, чтобы уйти с
+                поверхности и собрать историю глубины.
+              </p>
+            </div>
+            <button class="button" id="chapter-action">
+              Подготовить аппарат <span>↗</span>
+            </button>
+            <p id="action-status" role="status"></p>
+          </div>
+          <div class="depth-meter" aria-hidden="true">
+            <span class="mono">DEPTH</span>
+            <div class="depth-track"><i id="depth-fill"></i></div>
+            <strong id="depth-value" class="stats">0000</strong
+            ><span class="mono">МЕТРОВ</span>
+          </div>
+          <div class="story-bottom">
+            <p class="mono" id="scroll-hint">ПРОКРУТИ, ЧТОБЫ ПОГРУЗИТЬСЯ ↓</p>
+            <nav class="chapter-nav" aria-label="Этапы погружения">
+              <button data-chapter="0" aria-pressed="true" class="active">
+                <span>01</span>Поверхность</button
+              ><button data-chapter="1" aria-pressed="false">
+                <span>02</span>Сумерки</button
+              ><button data-chapter="2" aria-pressed="false">
+                <span>03</span>Свет</button
+              ><button data-chapter="3" aria-pressed="false">
+                <span>04</span>Дно</button
+              ><button data-chapter="4" aria-pressed="false">
+                <span>05</span>Возвращение
+              </button>
+            </nav>
+          </div>
+        </div>
+      </section>
+      <section id="journal" class="journal wrap">
+        <div class="section-top reveal">
+          <div>
+            <span class="eyebrow">ПОСЛЕ ПОГРУЖЕНИЯ</span>
+            <h2>То, что осталось<br />с тобой.</h2>
+          </div>
+          <p>
+            У каждой остановки есть действие. Выполни его, чтобы добавить
+            наблюдение в свой журнал. Записи сохраняются в этом браузере.
+          </p>
+        </div>
+        <p class="journal-progress mono" id="journal-progress" role="status">
+          ЗАПИСЕЙ: 0 / 5
+        </p>
+        <ol id="journal-entries" class="journal-entries"></ol>
+        <div class="journal-actions">
+          <button class="button" id="export-log">Скачать журнал ↓</button
+          ><button class="text-button" id="reset-log">
+            Начать новую экспедицию ↺</button
+          ><a href="#mission" class="text-button">На поверхность ↑</a>
+        </div>
+        <p id="journal-status" role="status"></p>
+      </section>
+      <section class="blueprint">
+        <div class="wrap blueprint-inner">
+          <div class="reveal">
+            <span class="eyebrow">АППАРАТ / ATLAS-07</span>
+            <h2>Небольшой корабль.<br />Большое неизвестное.</h2>
+            <p>
+              Сфера наблюдения, манипулятор, сборник образцов. Здесь каждая
+              деталь отвечает за действие на маршруте.
+            </p>
+            <p class="mono">ХУДОЖЕСТВЕННАЯ МОДЕЛЬ / НЕ РЕАЛЬНЫЙ АППАРАТ</p>
+          </div>
+          <svg
+            viewBox="0 0 600 360"
+            role="img"
+            aria-label="Авторский чертёж аппарата Atlas-07"
+            class="reveal"
+          >
+            <g fill="none" stroke="currentColor" stroke-width="1.5">
+              <path
+                d="M145 150h265v110H145zM210 150v-30h110v30M245 120V70h35v50M150 260v40h270v-40M410 160l55 30v70l-55-20M140 175H90v70h50"
+              />
+              <ellipse cx="410" cy="205" rx="52" ry="67" />
+              <circle cx="413" cy="205" r="31" />
+              <path
+                d="M230 265l-35 47h180M85 140V95h335M70 85h28m-14-14v28M435 87h28m-14-14v28"
+              />
+              <path d="M170 180h155m-155 20h110m-110 20h135" opacity=".35" />
+            </g>
+            <text
+              x="65"
+              y="340"
+              fill="currentColor"
+              font-size="13"
+              font-family="monospace"
+            >
+              ATLAS—07 / FIELD SKETCH
+            </text>
+          </svg>
+        </div>
+      </section>
+    </main>
+    <footer class="wrap site-footer">
+      <span>ABYSS / История глубины.</span
+      ><a href="../">Шесть разных миров ↗</a>
+    </footer>
+    <script src="../shared/three.min.js"></script>
+    <script src="../shared/scene-kit.js"></script>
+    <script src="main.js"></script>
+  </body>
+</html>

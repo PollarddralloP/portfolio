@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="description"
+      content="HUSH — интерактивная интерьерная студия. Меняй обстановку, материалы и свет, сохраняй свою комнату."
+    />
+    <title>HUSH — пространство для себя</title>
+    <link rel="stylesheet" href="../shared/fonts/fonts.css" />
+    <link rel="stylesheet" href="../shared/common.css" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip" href="#main">Перейти к содержимому</a>
+    <header class="site-header">
+      <a class="brand" href="../"
+        >HUSH<span class="mono">/ ROOM STUDIES</span></a
+      >
+      <nav>
+        <a href="#studio">Студия</a
+        ><a href="#notes" class="optional">О пространстве</a
+        ><a href="../">Портфолио ↗</a>
+      </nav>
+    </header>
+    <main id="main">
+      <section class="hero">
+        <div class="hero-copy entrance">
+          <p class="eyebrow">01 / ПРОСТРАНСТВО ДЛЯ СЕБЯ</p>
+          <h1>HUSH</h1>
+          <p class="hero-line">Меньше шума.<br />Больше своего.</p>
+          <p class="hero-description">
+            Собери комнату, в которой хочется задержаться. Начни со света, а не
+            с вещей.
+          </p>
+          <a class="button" href="#studio"
+            >Обжить пространство <span>↗</span></a
+          >
+        </div>
+        <div class="room-scene">
+          <canvas
+            id="room-canvas"
+            tabindex="0"
+            aria-label="Трёхмерный интерьер. Потяни для поворота или используй стрелки и плюс, минус."
+          ></canvas>
+          <div class="renderer-fallback" hidden>
+            <svg viewBox="0 0 600 500" role="img" aria-label="Эскиз комнаты">
+              <path fill="#ddc9aa" d="M60 320 300 460 550 300 300 170Z" />
+              <path fill="#e9e1d2" d="M60 320V120L300 20V170Z" />
+              <path fill="#d9d7bd" d="M300 20 550 140V300L300 170Z" />
+              <path fill="#a8b6a0" d="m160 270 150 85 70-40-150-85Z" />
+              <path fill="#b47852" d="M170 240v60l135 80v-60Z" />
+              <path fill="#65735c" d="m390 200 60 40 40-22-60-40Z" />
+            </svg>
+            <p class="fallback-note">
+              Показан эскиз. Настройки и сохранение работают; для объёмного
+              просмотра нужен WebGL.
+            </p>
+          </div>
+          <div class="scene-caption">
+            <span class="mono" id="room-label">ROOM 01 / ТЁПЛЫЙ ДУБ</span>
+            <div class="view-controls">
+              <button data-orbit="left" aria-label="Повернуть комнату влево">
+                ←</button
+              ><button data-orbit="right" aria-label="Повернуть комнату вправо">
+                →</button
+              ><button data-orbit="reset" aria-label="Вернуть общий вид">
+                ↺
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="hero-foot">
+          <span class="mono">СВОЯ КОМНАТА / ЭТЮД 01</span
+          ><a href="#studio" class="mono">ПРОКРУТИ И ОБЖИВИ ↓</a>
+        </div>
+      </section>
+      <section id="studio" class="studio wrap">
+        <div class="section-top reveal">
+          <div>
+            <span class="eyebrow">02 / ТВОИ РЕШЕНИЯ</span>
+            <h2>Как ты хочешь<br />провести вечер?</h2>
+          </div>
+          <p>
+            Выбери занятие. Комната перестроится под него: предметы, материалы и
+            свет можно менять отдельно.
+          </p>
+        </div>
+        <div class="activity-list reveal">
+          <button data-layout="lounge" aria-pressed="true" class="active">
+            <span class="mono">01</span><strong>Быть вместе</strong
+            ><span>Диван, стол и место для разговора.</span
+            ><b aria-hidden="true">↗</b></button
+          ><button data-layout="reading" aria-pressed="false">
+            <span class="mono">02</span><strong>Читать у окна</strong
+            ><span>Кресло, полка и мягкий свет.</span
+            ><b aria-hidden="true">↗</b></button
+          ><button data-layout="work" aria-pressed="false">
+            <span class="mono">03</span><strong>Поймать мысль</strong
+            ><span>Большой стол и свободная стена.</span
+            ><b aria-hidden="true">↗</b>
+          </button>
+        </div>
+        <div class="controls-grid reveal">
+          <fieldset>
+            <legend>Материалы</legend>
+            <div class="palette">
+              <button data-palette="oak" class="active" aria-pressed="true">
+                <i style="--swatch: #bb8d60"></i>Тёплый дуб</button
+              ><button data-palette="sage" aria-pressed="false">
+                <i style="--swatch: #8c9b7c"></i>Шалфей</button
+              ><button data-palette="clay" aria-pressed="false">
+                <i style="--swatch: #bf765b"></i>Красная глина
+              </button>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>Время дня</legend>
+            <label for="daylight"
+              >От ясного утра к тихому вечеру
+              <output id="light-label">Утро</output></label
+            ><input
+              id="daylight"
+              type="range"
+              min="0"
+              max="100"
+              value="20"
+            /><label class="check"
+              ><input id="lamp-toggle" type="checkbox" checked /> Включить
+              лампу</label
+            >
+          </fieldset>
+          <fieldset>
+            <legend>Последний штрих</legend>
+            <label class="check"
+              ><input id="plant-toggle" type="checkbox" checked />
+              Растения</label
+            ><label class="check"
+              ><input id="art-toggle" type="checkbox" checked /> Рисунок на
+              стене</label
+            ><button class="text-button" id="focus-detail">
+              Рассмотреть уголок ↗
+            </button>
+          </fieldset>
+        </div>
+        <div class="save-bar reveal">
+          <p id="room-status" role="status">
+            Настройки сохраняются только на твоём устройстве.
+          </p>
+          <button class="button" id="save-room">Сохранить мою комнату +</button
+          ><button class="button secondary" id="export-room">
+            Скачать решения ↓
+          </button>
+        </div>
+      </section>
+      <section id="notes" class="notes">
+        <div class="wrap notes-inner">
+          <div class="reveal">
+            <span class="eyebrow">03 / ОСТАВИТЬ ВОЗДУХ</span>
+            <h2>Свет — тоже<br />предмет интерьера.</h2>
+            <p>
+              В этой студии нет каталога покупок. Здесь можно почувствовать, что
+              меняется, когда кресло поворачивается к окну, а тёплый свет
+              собирает комнату вечером.
+            </p>
+            <a class="button" href="#main">Вернуться в комнату ↗</a>
+          </div>
+          <svg
+            class="window-drawing reveal"
+            viewBox="0 0 420 380"
+            role="img"
+            aria-label="Авторский рисунок света из окна"
+          >
+            <g fill="none" stroke="currentColor" stroke-width="1.5">
+              <path
+                d="M70 40h190v230H70zM165 40v230M70 145h190M260 270l110 60H180L70 270M70 40l25-15h190v230l-25 15M285 255l85 75"
+              />
+              <path
+                d="m70 145 110 185m95-185 95 185m-300-60 110 60"
+                opacity=".35"
+              />
+            </g>
+            <circle
+              cx="165"
+              cy="145"
+              r="72"
+              fill="currentColor"
+              opacity=".05"
+            />
+          </svg>
+        </div>
+      </section>
+    </main>
+    <footer class="wrap site-footer">
+      <span>HUSH / Пространство для себя.</span
+      ><a href="../">Шесть разных миров ↗</a>
+    </footer>
+    <script src="../shared/three.min.js"></script>
+    <script src="../shared/scene-kit.js"></script>
+    <script src="main.js"></script>
+  </body>
+</html>

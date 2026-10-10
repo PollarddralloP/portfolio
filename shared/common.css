@@ -1,0 +1,281 @@
+* {
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  margin: 0;
+  font-family: Manrope, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+button,
+input,
+select {
+  font: inherit;
+}
+button,
+a,
+input,
+select {
+  touch-action: manipulation;
+}
+button {
+  cursor: pointer;
+}
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+button:active {
+  transform: scale(0.96);
+}
+button:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+canvas:focus-visible,
+summary:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 5px;
+}
+a {
+  color: inherit;
+}
+p {
+  line-height: 1.7;
+  text-wrap: pretty;
+}
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+button {
+  min-height: 44px;
+}
+button,
+input,
+select {
+  border-radius: 0;
+}
+canvas {
+  display: block;
+}
+[hidden] {
+  display: none !important;
+}
+.skip {
+  position: fixed;
+  z-index: 100;
+  left: 18px;
+  top: 12px;
+  transform: translateY(-180%);
+  background: #fff;
+  color: #111;
+  padding: 14px;
+}
+.skip:focus {
+  transform: none;
+}
+.mono {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+}
+.site-header {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 25px 4.5%;
+  gap: 20px;
+}
+.site-header a {
+  text-decoration: none;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.site-header .brand {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.055em;
+}
+.site-header nav {
+  display: flex;
+  gap: 28px;
+  font-size: 12px;
+}
+.wrap {
+  width: min(1200px, 91%);
+  margin: auto;
+}
+.eyebrow {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.07em;
+}
+.reveal {
+  transition:
+    opacity 0.65s,
+    transform 0.65s;
+}
+.motion-ready .reveal:not(.visible) {
+  opacity: 0;
+  transform: translateY(22px);
+}
+.entrance {
+  animation: arrival 0.8s both;
+}
+.delay {
+  animation-delay: 0.15s;
+}
+@keyframes arrival {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 25px;
+  min-height: 48px;
+  padding: 12px 23px;
+  text-decoration: none;
+  border: 1px solid currentColor;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 600;
+  transition:
+    background 0.18s,
+    color 0.18s,
+    transform 0.18s;
+}
+.section-top {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 40px;
+  margin-bottom: 40px;
+}
+.section-top h2 {
+  margin: 14px 0 0;
+  font-size: clamp(34px, 5vw, 64px);
+  line-height: 1.05;
+  letter-spacing: -0.05em;
+  font-weight: 400;
+}
+.section-top p {
+  max-width: 400px;
+  margin: 0;
+  font-size: 13px;
+}
+.site-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 30px 0;
+  font-size: 12px;
+  border-top: 1px solid currentColor;
+}
+.site-footer a {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+.renderer-fallback {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 25px;
+}
+.renderer-fallback svg {
+  width: 80%;
+  height: 80%;
+}
+.fallback-note {
+  position: absolute;
+  bottom: 12px;
+  left: 20px;
+  font-size: 12px;
+  max-width: 80%;
+  padding: 10px;
+  background: var(--paper, #f0eee6);
+  color: var(--ink, #232923);
+}
+.view-controls {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.view-controls button {
+  width: 44px;
+  min-height: 44px;
+  border: 1px solid currentColor;
+  background: transparent;
+  color: inherit;
+  font-size: 18px;
+}
+.stats {
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 650px) {
+  .site-header {
+    padding: 15px 5%;
+  }
+  .site-header nav {
+    gap: 14px;
+  }
+  .site-header nav .optional {
+    display: none;
+  }
+  .section-top {
+    display: block;
+  }
+  .section-top p {
+    margin-top: 22px;
+  }
+  .site-footer {
+    flex-direction: column;
+  }
+  .mono,
+  .eyebrow {
+    font-size: 10px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal,
+  .entrance {
+    animation: none;
+    transition: none;
+  }
+  .motion-ready .reveal:not(.visible) {
+    opacity: 1;
+    transform: none;
+  }
+  * {
+    scroll-behavior: auto !important;
+  }
+  button:active {
+    transform: none;
+  }
+}

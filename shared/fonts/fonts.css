@@ -1,0 +1,24 @@
+@font-face {
+  font-family: Manrope;
+  src: url(755fa076675e.ttf) format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: Manrope;
+  src: url(900670474e93.ttf) format("truetype");
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url(b0c618f6d8ea.ttf) format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Cormorant Garamond";
+  src: url(bb8f3c3b0ca4.ttf) format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}

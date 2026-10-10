@@ -1,0 +1,488 @@
+:root {
+  --paper: #071b24;
+  --ink: #e6f1ee;
+  --accent: #e9d366;
+  background: var(--paper);
+  color: var(--ink);
+}
+.site-header .brand {
+  letter-spacing: -0.02em;
+}
+.site-header .brand .mono {
+  font-size: 9px;
+  color: #a7c5cb;
+}
+.site-header nav {
+  color: #c5d9da;
+}
+.story {
+  height: 560svh;
+  position: relative;
+}
+.story-viewport {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  min-height: 690px;
+  overflow: hidden;
+  background: #071b24;
+}
+.ocean-scene {
+  position: absolute;
+  inset: 0;
+}
+#ocean-canvas {
+  width: 100%;
+  height: 100%;
+}
+.chapter-copy {
+  position: relative;
+  z-index: 2;
+  padding: 135px 0 115px 4.5%;
+  width: 43%;
+  max-width: 650px;
+  pointer-events: none;
+}
+.chapter-copy button {
+  pointer-events: auto;
+}
+.chapter-copy h1 {
+  font-size: clamp(98px, 12vw, 190px);
+  font-weight: 600;
+  line-height: 0.9;
+  letter-spacing: -0.09em;
+  margin: 28px 0 42px;
+}
+.chapter-text {
+  max-width: 350px;
+}
+.chapter-text .mono {
+  color: var(--accent);
+}
+.chapter-text h2 {
+  font-size: clamp(28px, 3.2vw, 43px);
+  line-height: 1.12;
+  letter-spacing: -0.04em;
+  font-weight: 400;
+  margin: 18px 0;
+}
+.chapter-text p {
+  font-size: 13px;
+  line-height: 1.75;
+  color: #b6ccd0;
+  max-width: 305px;
+  min-height: 90px;
+}
+.chapter-copy .button {
+  border: 0;
+  background: var(--accent);
+  color: #142630;
+  margin-top: 7px;
+}
+.chapter-copy .button:disabled {
+  opacity: 1;
+  background: #bed0c4;
+}
+#action-status {
+  font-size: 11px;
+  color: #ccddd9;
+  max-width: 300px;
+  min-height: 30px;
+}
+.chapter-text.changing {
+  animation: chapterIn 0.45s both;
+}
+@keyframes chapterIn {
+  from {
+    opacity: 0.3;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.depth-meter {
+  position: absolute;
+  right: 4.5%;
+  top: 130px;
+  bottom: 140px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-items: center;
+  width: 62px;
+  color: #a7c8cf;
+}
+.depth-track {
+  position: relative;
+  height: 100%;
+  width: 1px;
+  background: #537a8380;
+  min-height: 90px;
+}
+.depth-track::before {
+  content: "";
+  position: absolute;
+  inset: 0 -4px;
+  background: repeating-linear-gradient(
+    transparent 0 26px,
+    #9fbcc24d 26px 27px
+  );
+}
+#depth-fill {
+  position: absolute;
+  top: 0;
+  left: -1px;
+  width: 3px;
+  background: var(--accent);
+  height: 0;
+}
+.depth-meter strong {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--accent);
+}
+.depth-meter .mono {
+  font-size: 8px;
+}
+.story-bottom {
+  position: absolute;
+  bottom: 23px;
+  left: 4.5%;
+  right: 4.5%;
+  z-index: 3;
+}
+.story-bottom > p {
+  color: #c1d3d5;
+  font-size: 9px;
+  margin: 0 0 20px;
+}
+.chapter-nav {
+  display: flex;
+  border-top: 1px solid #42636e;
+  gap: 30px;
+  padding-top: 14px;
+  justify-content: space-between;
+}
+.chapter-nav button {
+  border: 0;
+  background: transparent;
+  color: #a8c4cb;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  font-size: 11px;
+  text-align: left;
+  padding: 0;
+}
+.chapter-nav span {
+  font-family: "IBM Plex Mono", monospace;
+  color: #75939e;
+}
+.chapter-nav button.active,
+.chapter-nav button.active span {
+  color: var(--accent);
+}
+.journal {
+  padding: 95px 0;
+}
+.journal .section-top p {
+  color: #b3cbd0;
+}
+.journal-progress {
+  color: var(--accent);
+  margin: 0 0 24px;
+}
+.journal-entries {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.journal-entries li {
+  display: grid;
+  grid-template-columns: 50px 1fr 100px;
+  gap: 22px;
+  align-items: start;
+  padding: 28px 0;
+  border-top: 1px solid #355760;
+}
+.journal-entries h3 {
+  font-size: 21px;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  margin: 0 0 10px;
+}
+.journal-entries p {
+  font-size: 12px;
+  color: #b6ccd0;
+  max-width: 650px;
+  margin: 0;
+}
+.journal-entries .status {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  color: var(--accent);
+  text-align: right;
+}
+.journal-entries li.pending {
+  opacity: 0.75;
+}
+.journal-entries li:last-child {
+  border-bottom: 1px solid #355760;
+}
+.journal-actions {
+  display: flex;
+  gap: 25px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 35px;
+}
+.journal-actions .button {
+  color: #142630;
+  background: var(--accent);
+  border: 0;
+}
+.text-button {
+  background: transparent;
+  color: #c4d9db;
+  border: 0;
+  border-bottom: 1px solid #5b7c84;
+  padding: 10px 0;
+  text-decoration: none;
+  font-size: 12px;
+  min-height: 44px;
+}
+#journal-status {
+  font-size: 12px;
+  color: #b3cbd0;
+}
+.blueprint {
+  background: #102d38;
+  padding: 85px 0;
+}
+.blueprint-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 65px;
+  align-items: center;
+}
+.blueprint h2 {
+  font-size: clamp(32px, 4vw, 54px);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 1.13;
+  margin: 20px 0;
+}
+.blueprint p {
+  font-size: 12px;
+  color: #b5cdd1;
+  max-width: 390px;
+}
+.blueprint svg {
+  width: 100%;
+  color: #9cc1c9;
+}
+.site-footer {
+  border-color: #355760;
+  margin-top: 25px;
+}
+.button:hover {
+  filter: brightness(1.08);
+}
+@media (max-width: 1050px) {
+  .chapter-copy {
+    padding-top: 130px;
+    width: 48%;
+  }
+  .chapter-copy h1 {
+    font-size: 130px;
+  }
+  .depth-meter {
+    right: 3%;
+    width: 40px;
+  }
+  .chapter-nav {
+    gap: 15px;
+  }
+}
+@media (max-width: 650px) {
+  .site-header .brand .mono {
+    display: none;
+  }
+  .story {
+    height: 490svh;
+  }
+  .story-viewport {
+    min-height: 740px;
+  }
+  .chapter-copy {
+    padding: 100px 5% 100px;
+    width: 100%;
+    max-width: none;
+  }
+  .chapter-copy > .eyebrow {
+    font-size: 8px;
+  }
+  .chapter-copy h1 {
+    font-size: 92px;
+    margin: 26px 0 26px;
+  }
+  .chapter-text {
+    max-width: 245px;
+  }
+  .chapter-text h2 {
+    font-size: 27px;
+    margin: 16px 0;
+  }
+  .chapter-text p {
+    font-size: 12px;
+    max-width: 235px;
+    min-height: 90px;
+  }
+  .chapter-copy .button {
+    font-size: 11px;
+    padding: 10px 16px;
+  }
+  .ocean-scene {
+    left: -30%;
+    right: -20%;
+    top: 0;
+    bottom: 0;
+  }
+  .depth-meter {
+    right: 5%;
+    top: 120px;
+    bottom: 160px;
+    width: 40px;
+  }
+  .depth-meter strong {
+    font-size: 16px;
+  }
+  .depth-track {
+    max-height: 340px;
+  }
+  .story-bottom {
+    bottom: 20px;
+  }
+  .chapter-nav {
+    gap: 8px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+  }
+  .chapter-nav button {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 7px;
+    font-size: 8px;
+    line-height: 1.35;
+  }
+  .chapter-nav span {
+    font-size: 11px;
+  }
+  .story-bottom > p {
+    font-size: 8px;
+  }
+  .journal {
+    padding: 60px 0;
+  }
+  .journal-entries li {
+    grid-template-columns: 25px 1fr;
+    gap: 12px;
+  }
+  .journal-entries .status {
+    grid-column: 2;
+    text-align: left;
+  }
+  .journal-entries h3 {
+    font-size: 20px;
+  }
+  .blueprint-inner {
+    grid-template-columns: 1fr;
+    gap: 35px;
+  }
+  .blueprint {
+    padding: 60px 0;
+  }
+  #action-status {
+    font-size: 10px;
+    max-width: 220px;
+  }
+  .journal-actions {
+    gap: 15px;
+  }
+  .journal-actions .button {
+    width: 100%;
+  }
+}
+@media (min-width: 651px) and (max-height: 800px) {
+  .story-viewport {
+    min-height: 600px;
+  }
+  .chapter-copy {
+    padding-top: 105px;
+  }
+  .chapter-copy h1 {
+    font-size: 105px;
+    margin: 20px 0 24px;
+  }
+  .chapter-text h2 {
+    font-size: 31px;
+    margin: 14px 0;
+  }
+  .chapter-text p {
+    font-size: 12px;
+    min-height: 65px;
+  }
+  .chapter-copy .button {
+    margin-top: 0;
+  }
+  #action-status {
+    font-size: 10px;
+    line-height: 1.5;
+  }
+  .depth-meter {
+    top: 110px;
+    bottom: 140px;
+  }
+  .story-bottom {
+    bottom: 18px;
+  }
+}
+@media (max-width: 650px) and (max-height: 760px) {
+  .story-viewport {
+    min-height: 600px;
+  }
+  .chapter-copy {
+    padding-top: 82px;
+  }
+  .chapter-copy h1 {
+    font-size: 76px;
+    margin: 18px 0 21px;
+  }
+  .chapter-text h2 {
+    font-size: 25px;
+    margin: 12px 0;
+  }
+  .chapter-text p {
+    min-height: 65px;
+    margin-bottom: 14px;
+  }
+  .chapter-copy .button {
+    margin-top: 0;
+  }
+  .depth-meter {
+    top: 100px;
+    bottom: 150px;
+  }
+  .story-bottom {
+    bottom: 15px;
+  }
+  .story-bottom > p {
+    margin-bottom: 12px;
+  }
+  #action-status {
+    margin-top: 8px;
+  }
+}
