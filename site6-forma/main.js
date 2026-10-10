@@ -69,13 +69,13 @@
   texture.encoding = THREE.sRGBEncoding;
   texture.anisotropy = 4;
   const hero = K.create(document.getElementById("hero-vessel"), {
-      background: "#f3efe6",
+      background: "transparent",
       position: [6, 4, 8],
       target: [0, 1.35, 0],
       fov: 34,
     }),
     preview = K.create(document.getElementById("preview-vessel"), {
-      background: "#e5e2d8",
+      background: "transparent",
       position: [5, 3.5, 7],
       target: [0, 1.4, 0],
       fov: 36,
@@ -88,10 +88,11 @@
     const floor = K.mesh(
       app.scene,
       new THREE.PlaneGeometry(80, 80),
-      K.material(i ? "#e5e2d8" : "#f3efe6"),
+      new THREE.ShadowMaterial({color: "#343b33", opacity: .18}),
       [0, -0.015, 0],
       [-Math.PI / 2, 0, 0],
     );
+    floor.castShadow = false;
     const material = new THREE.MeshStandardMaterial({
       map: texture,
       roughness: 0.3,

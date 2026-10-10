@@ -51,7 +51,7 @@
     storageAvailable = false;
   }
   const app = K.create(canvas, {
-    background: "#f0ece2",
+    background: "transparent",
     position: [10, 8, 12],
     target: [0, 0.8, 0],
     fov: 34,

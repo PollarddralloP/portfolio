@@ -56,6 +56,7 @@ const SceneKit = (() => {
       renderer = new THREE.WebGLRenderer({
         canvas,
         antialias: true,
+        alpha: background === "transparent",
         preserveDrawingBuffer: true,
       });
     } catch {
@@ -73,7 +74,7 @@ const SceneKit = (() => {
     renderer.shadowMap.enabled = shadows;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     const scene = new THREE.Scene();
-    scene.background = color(background);
+    scene.background = background === "transparent" ? null : color(background);
     const camera = new THREE.PerspectiveCamera(fov, 1, 0.1, 180);
     camera.position.set(...position);
     let look = new THREE.Vector3(...target),
