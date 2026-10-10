@@ -420,6 +420,7 @@
         }),
         pos,
       );
+      b.castShadow = b.receiveShadow = false;
       b.userData.id = id;
       hitboxes.push(b);
     }
