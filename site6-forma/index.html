@@ -1,317 +1,105 @@
 <!doctype html>
 <html lang="ru">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#171c20" />
+    <title>FLUX — Маленький беспорядок</title>
     <meta
       name="description"
-      content="FORMA — керамическая мастерская в браузере. Создай форму, нарисуй узор и перенеси его на 3D-сосуд."
+      content="Физическая 3D-песочница: маятники, столкновения, орбиты и рисунки из движущихся шаров."
     />
-    <title>FORMA — у вещей есть характер</title>
     <link rel="stylesheet" href="../shared/fonts/fonts.css" />
-    <link rel="stylesheet" href="../shared/common.css" />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="../shared/play.css?v=3" />
+    <link rel="stylesheet" href="styles.css?v=3" />
   </head>
   <body>
-    <a class="skip" href="#workshop">Перейти в мастерскую</a>
-    <header class="site-header">
-      <a class="brand" href="../">F / STUDIO</a>
-      <nav>
-        <a href="#workshop">Мастерская</a
-        ><a href="#process" class="optional">Как это работает</a
-        ><a href="../">Портфолио ↗</a>
-      </nav>
+    <header>
+      <a href="../">← Портфолио</a>
+      <div class="identity">
+        <h1>FLUX<span class="brand-dot">●</span></h1>
+        <span class="eyebrow">Маленький беспорядок</span>
+      </div>
+      <button id="export">Снять кадр ↗</button>
     </header>
-    <main>
-      <section class="hero">
-        <div class="hero-copy">
-          <p class="eyebrow entrance">ЦИФРОВАЯ КЕРАМИКА / РУЧНОЙ ХАРАКТЕР</p>
-          <h1 class="entrance delay">FORMA</h1>
-          <p class="hero-line entrance delay">У вещей<br />есть характер.</p>
-          <p class="hero-description">
-            У этой будет твой.<br />Форма, цвет и рисунок — с чистого листа.
-          </p>
-          <a class="button" href="#workshop"
-            >Создать свою вещь <span>↗</span></a
-          >
-        </div>
-        <div class="hero-object">
-          <canvas
-            id="hero-vessel"
-            tabindex="0"
-            aria-label="Керамический сосуд. Потяни для вращения или используй стрелки, плюс и минус."
-          ></canvas>
-          <div class="renderer-fallback" hidden>
-            <svg
-              viewBox="0 0 420 500"
-              role="img"
-              aria-label="Авторский рисунок вазы"
-            >
-              <path
-                d="M154 60h112l-16 100c70 80 86 210 35 282H135c-51-72-35-202 35-282Z"
-                fill="#e5dbca"
-                stroke="#214caa"
-                stroke-width="3"
-              />
-              <g fill="none" stroke="#214caa" stroke-width="6">
-                <path
-                  d="M140 270q70-100 140 0m-145 50q75-100 150 0m-145 50q70-100 140 0"
-                />
-              </g>
-              <ellipse cx="210" cy="60" rx="55" ry="12" fill="#bdad91" />
-            </svg>
-            <p class="fallback-note">
-              Объём недоступен. Рисунок, параметры и экспорт работают.
-            </p>
-          </div>
-          <span class="object-label mono">ОБЪЕКТ № 001 / СВОБОДНАЯ ФОРМА</span>
-        </div>
-        <div class="hero-footer">
-          <span class="mono">СДЕЛАНО ТОБОЙ, А НЕ ПО ШАБЛОНУ</span
-          ><a href="#workshop" class="mono">ОТКРЫТЬ МАСТЕРСКУЮ ↓</a>
-        </div>
-      </section>
-      <section id="workshop" class="workshop wrap">
-        <div class="section-top reveal">
-          <div>
-            <span class="eyebrow">01 / ФОРМА + ТВОЙ СЛЕД</span>
-            <h2>Дай рукам<br />сделать своё.</h2>
-          </div>
-          <p>
-            Рисуй на листе — узор сразу появляется на сосуде. Его можно
-            повернуть, изменить силуэт и забрать рисунок с собой.
+    <main class="flux-app">
+      <section class="scene-area">
+        <canvas
+          id="flux-canvas"
+          class="scene"
+          tabindex="0"
+          aria-label="Физическая песочница. Выбирай инструмент ниже, затем нажимай или перетаскивай объекты. Клавиатура: стрелки — точка броска, Enter — бросить или толкнуть, пробел — пауза."
+        ></canvas>
+        <p class="renderer-fallback" hidden>
+          Для физической сцены нужен WebGL. Попробуй другой браузер.
+        </p>
+        <div class="scene-heading">
+          <p class="eyebrow">ПРИЧИНА → ДВИЖЕНИЕ → ЭФФЕКТ</p>
+          <h2>Потрогай.<br />Нарушь.<br />Повтори.</h2>
+          <p id="scene-note">
+            Подними крайний шар и отпусти.<br />Удар доберётся до другого края.
           </p>
         </div>
-        <div class="workbench">
-          <div class="drawing-board">
-            <div class="board-top">
-              <span class="mono">01 / РИСУНОК</span
-              ><span class="mono">512 × 512</span>
-            </div>
-            <canvas
-              id="paint-canvas"
-              width="512"
-              height="512"
-              tabindex="0"
-              aria-label="Холст для узора. Рисуй мышью или пальцем; готовые рисунки доступны кнопками ниже."
-            ></canvas>
-            <div class="drawing-actions">
-              <button id="undo" aria-label="Отменить последний штрих">
-                ↶ Отменить</button
-              ><button id="redo" aria-label="Вернуть отменённый штрих">
-                ↷ Вернуть</button
-              ><button id="clear-paint">Чистый лист</button>
-            </div>
-            <p>
-              Один непрерывный жест — один штрих. Готовые рисунки доступны без
-              рисования мышью.
-            </p>
-          </div>
-          <div class="object-preview">
-            <div class="board-top">
-              <span class="mono">02 / ТВОЯ КЕРАМИКА</span
-              ><span class="mono" id="form-name">ВАЗА</span>
-            </div>
-            <div class="preview-stage">
-              <canvas
-                id="preview-vessel"
-                tabindex="0"
-                aria-label="Предпросмотр твоего сосуда. Стрелки поворачивают, плюс и минус меняют масштаб."
-              ></canvas>
-              <div class="renderer-fallback" hidden>
-                <svg
-                  viewBox="0 0 420 500"
-                  role="img"
-                  aria-label="Контур сосуда"
-                >
-                  <path
-                    d="M154 60h112l-16 100c70 80 86 210 35 282H135c-51-72-35-202 35-282Z"
-                    fill="#e5dbca"
-                    stroke="#214caa"
-                    stroke-width="3"
-                  />
-                </svg>
-                <p class="fallback-note">
-                  Показан контур. Рисунок и настройки доступны.
-                </p>
-              </div>
-            </div>
-            <div class="view-controls">
-              <button
-                data-object-view="left"
-                aria-label="Повернуть сосуд влево"
-              >
-                ←</button
-              ><button
-                data-object-view="right"
-                aria-label="Повернуть сосуд вправо"
-              >
-                →</button
-              ><button
-                data-object-view="reset"
-                aria-label="Вернуть исходный ракурс"
-              >
-                ↺
-              </button>
-            </div>
-            <p id="object-summary" class="stats">
-              Ваза · высота 100% · гладкая поверхность
-            </p>
-          </div>
-          <div class="tool-panel">
-            <fieldset>
-              <legend>Силуэт</legend>
-              <div class="shape-buttons">
-                <button data-shape="vase" aria-pressed="true" class="active">
-                  Ваза</button
-                ><button data-shape="bottle" aria-pressed="false">Бутыль</button
-                ><button data-shape="bowl" aria-pressed="false">Чаша</button>
-              </div>
-              <label for="height"
-                >Высота <output id="height-label">100%</output></label
-              ><input
-                id="height"
-                type="range"
-                min="70"
-                max="140"
-                value="100"
-              /><label for="ribs"
-                >Рельеф <output id="ribs-label">Гладкий</output></label
-              ><input id="ribs" type="range" min="0" max="8" value="0" />
-            </fieldset>
-            <fieldset>
-              <legend>Глазурь</legend>
-              <label for="glaze">Цвет поверхности</label
-              ><select id="glaze">
-                <option value="ivory">Молочная</option>
-                <option value="cobalt">Кобальтовая</option>
-                <option value="clay">Терракотовая</option>
-              </select>
-            </fieldset>
-            <fieldset>
-              <legend>Твоя кисть</legend>
-              <div class="ink-swatches">
-                <button
-                  data-ink="#214caa"
-                  class="active"
-                  style="--ink-color: #214caa"
-                  aria-label="Кобальтовые чернила"
-                  aria-pressed="true"
-                ></button
-                ><button
-                  data-ink="#26382f"
-                  style="--ink-color: #26382f"
-                  aria-label="Тёмные чернила"
-                  aria-pressed="false"
-                ></button
-                ><button
-                  data-ink="#c66b49"
-                  style="--ink-color: #c66b49"
-                  aria-label="Терракотовые чернила"
-                  aria-pressed="false"
-                ></button
-                ><button
-                  data-ink="#f3e9d8"
-                  style="--ink-color: #f3e9d8"
-                  aria-label="Светлые чернила"
-                  aria-pressed="false"
-                ></button>
-              </div>
-              <label for="brush-size"
-                >Толщина <output id="brush-label">8 px</output></label
-              ><input id="brush-size" type="range" min="2" max="24" value="8" />
-            </fieldset>
-          </div>
-        </div>
-        <div class="pattern-strip reveal">
-          <span class="eyebrow">ИЛИ НАЧНИ С РИСУНКА</span>
-          <div class="pattern-buttons">
-            <button data-pattern="waves" class="active" aria-pressed="true">
-              <svg viewBox="0 0 70 50" aria-hidden="true">
-                <path d="M4 15q15-18 30 0t30 0M4 32q15-18 30 0t30 0" /></svg
-              >Волны</button
-            ><button data-pattern="botanical" aria-pressed="false">
-              <svg viewBox="0 0 70 50" aria-hidden="true">
-                <path
-                  d="M12 43 54 6M22 34q-17-22 5-13M34 23q21 8 19-10M40 17q-18-20 5-9"
-                /></svg
-              >Ботаника</button
-            ><button data-pattern="orbit" aria-pressed="false">
-              <svg viewBox="0 0 70 50" aria-hidden="true">
-                <ellipse cx="35" cy="25" rx="24" ry="13" />
-                <ellipse
-                  cx="35"
-                  cy="25"
-                  rx="12"
-                  ry="23"
-                  transform="rotate(35 35 25)"
-                /></svg
-              >Орбиты</button
-            ><button data-pattern="blank" aria-pressed="false">
-              <svg viewBox="0 0 70 50" aria-hidden="true">
-                <path d="M15 7h40v36H15Z" /></svg
-              >Чистый
-            </button>
-          </div>
-          <button class="text-button" id="new-variation">Другой ритм ↺</button>
-        </div>
-        <div class="finish-bar">
-          <p id="studio-status" role="status">
-            Это твоя мастерская. Сохрани работу, чтобы продолжить позже.
-          </p>
-          <button class="button" id="save-piece">Сохранить работу +</button
-          ><button class="button outline" id="export-pattern">
-            Скачать рисунок ↓
+        <nav class="presets" aria-label="Сценарий эксперимента">
+          <button data-preset="cradle" aria-pressed="true">01 / Маятник</button
+          ><button data-preset="avalanche" aria-pressed="false">
+            02 / Лавина</button
+          ><button data-preset="orbit" aria-pressed="false">03 / Орбита</button
+          ><button data-preset="empty" aria-pressed="false">
+            04 / Чистый лист
           </button>
+        </nav>
+        <div class="readout">
+          <span><b id="count">5</b> объектов</span
+          ><span>энергия <b id="energy">0.00</b></span
+          ><button id="camera" aria-label="Изменить ракурс">Ракурс ↶</button>
         </div>
       </section>
-      <section id="process" class="process">
-        <div class="wrap">
-          <div class="section-top reveal">
-            <div>
-              <span class="eyebrow">02 / ТАК РОЖДАЕТСЯ ВЕЩЬ</span>
-              <h2>Не идеальная.<br />Твоя.</h2>
-            </div>
-            <p>
-              Неровная линия делает рисунок живым. Здесь можно пробовать,
-              отменять и начинать заново без испорченной глины.
-            </p>
-          </div>
-          <div class="process-steps reveal">
-            <div>
-              <span class="mono">I / ОБЪЁМ</span>
-              <h3>Найди силуэт.</h3>
-              <p>
-                Узкая бутыль, свободная ваза или открытая чаша. Высота и рельеф
-                меняют ощущение формы.
-              </p>
-            </div>
-            <div>
-              <span class="mono">II / СЛЕД</span>
-              <h3>Оставь рисунок.</h3>
-              <p>
-                Линии оборачиваются вокруг поверхности. Покрути сосуд, чтобы
-                найти начало и конец узора.
-              </p>
-            </div>
-            <div>
-              <span class="mono">III / ВЕЩЬ</span>
-              <h3>Забери с собой.</h3>
-              <p>
-                Сохрани свою работу в браузере или скачай рисунок PNG — он
-                настоящий, 512 на 512 пикселей.
-              </p>
-            </div>
+      <section class="workbench" aria-label="Инструменты песочницы">
+        <div class="tool-group">
+          <p class="eyebrow">Что делать</p>
+          <div class="toolbar">
+            <button data-tool="grab" aria-pressed="true">Тянуть</button
+            ><button data-tool="drop" aria-pressed="false">Бросать</button
+            ><button data-tool="paint" aria-pressed="false">Рисовать</button
+            ><button data-tool="magnet" aria-pressed="false">Магнит</button
+            ><button data-tool="repel" aria-pressed="false">Толкать</button>
           </div>
         </div>
+        <div class="settings">
+          <label for="gravity"
+            >Гравитация <output id="gravity-value">9.8</output
+            ><input
+              type="range"
+              id="gravity"
+              min="0"
+              max="20"
+              step="0.2"
+              value="9.8" /></label
+          ><label for="bounce"
+            >Упругость <output id="bounce-value">0.98</output
+            ><input
+              type="range"
+              id="bounce"
+              min="0.1"
+              max="1"
+              step="0.01"
+              value="0.98"
+          /></label>
+        </div>
+        <div class="playback">
+          <button id="play" class="primary">Пауза</button
+          ><button id="step">Шаг</button><button id="reset">Сбросить</button>
+        </div>
+        <p id="status" class="status" role="status">
+          Возьми шар мышью или пальцем. Кнопка «Толчок» запустит маятник без
+          перетаскивания.
+        </p>
+        <button id="kick">Толчок →</button>
       </section>
     </main>
-    <footer class="wrap site-footer">
-      <span>FORMA / Цифровая мастерская.</span
-      ><a href="../">Шесть разных миров ↗</a>
-    </footer>
     <script src="../shared/three.min.js"></script>
-    <script src="../shared/scene-kit.js?v=2"></script>
-    <script src="main.js?v=2"></script>
+    <script src="../shared/scene-kit.js?v=3"></script>
+    <script src="main.js?v=3"></script>
   </body>
 </html>

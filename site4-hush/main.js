@@ -1,55 +1,6 @@
 (() => {
   const K = SceneKit,
-    canvas = document.getElementById("room-canvas"),
-    storageKey = "hush-room-v1";
-  const palettes = {
-    oak: {
-      wall: "#ddd4be",
-      wood: "#af8356",
-      fabric: "#dfcdb4",
-      accent: "#a46e4c",
-      label: "Тёплый дуб",
-    },
-    sage: {
-      wall: "#d2d8c5",
-      wood: "#ab9470",
-      fabric: "#9bac93",
-      accent: "#637859",
-      label: "Шалфей",
-    },
-    clay: {
-      wall: "#e4d3c5",
-      wood: "#936342",
-      fabric: "#c38468",
-      accent: "#b66040",
-      label: "Красная глина",
-    },
-  };
-  let state = {
-      layout: "lounge",
-      palette: "oak",
-      daylight: 20,
-      lamp: true,
-      plants: true,
-      art: true,
-    },
-    storageAvailable = true,
-    dirty = false;
-  try {
-    const saved = JSON.parse(localStorage.getItem(storageKey) || "null");
-    if (
-      saved &&
-      Object.hasOwn(palettes, saved.palette) &&
-      ["lounge", "reading", "work"].includes(saved.layout) &&
-      Number.isFinite(saved.daylight) &&
-      saved.daylight >= 0 &&
-      saved.daylight <= 100 &&
-      ["lamp", "plants", "art"].every((k) => typeof saved[k] === "boolean")
-    )
-      state = saved;
-  } catch {
-    storageAvailable = false;
-  }
+    canvas = document.getElementById("room-canvas");
   const app = K.create(canvas, {
     background: "transparent",
     position: [10, 8, 12],
@@ -62,8 +13,7 @@
     lampLight,
     lights,
     plantGroup,
-    artGroup,
-    orbit;
+    artGroup;
   function build() {
     const s = app.scene;
     room = new THREE.Group();
@@ -338,151 +288,367 @@
       [1.72, 1.92, -2.76],
     );
     lights = app.lights({ power: 1.8, ambient: 0.65, pos: [-3, 9, 5] });
-    orbit = app.enableOrbit({
-      radius: 17,
-      azimuth: 0.7,
-      elevation: 0.43,
-      target: [0, 0.8, 0],
-      min: 9,
-      max: 21,
-    });
   }
-  if (app) build();
-  function sync() {
-    const p = palettes[state.palette];
-    if (app) {
-      mats.wall.color.copy(K.color(p.wall));
-      mats.wood.color.copy(K.color(p.wood));
-      mats.fabric.color.copy(K.color(p.fabric));
-      mats.accent.color.copy(K.color(p.accent));
-      Object.entries(groups).forEach(
-        ([id, g]) => (g.visible = id === state.layout),
+
+  const initial = () => ({
+    clues: [],
+    lamp: true,
+    key: false,
+    escaped: false,
+    visited: [],
+    hints: 0,
+  });
+  let state = initial(),
+    selected = null;
+  try {
+    const s = JSON.parse(localStorage.getItem("room404-v3"));
+    if (
+      s &&
+      Array.isArray(s.clues) &&
+      s.clues.every((x) =>
+        ["letter", "window", "book", "painting"].includes(x),
+      ) &&
+      Array.isArray(s.visited) &&
+      s.visited.every((x) =>
+        [
+          "letter",
+          "lamp",
+          "window",
+          "book",
+          "painting",
+          "safe",
+          "door",
+        ].includes(x),
+      ) &&
+      Number.isInteger(s.hints) &&
+      s.hints >= 0 &&
+      ["lamp", "key", "escaped"].every((x) => typeof s[x] === "boolean")
+    )
+      state = { ...initial(), ...s };
+  } catch {}
+  const targets = {
+    letter: [0.9, 0.62, 1.2],
+    lamp: [0.55, 2.4, 0.4],
+    window: [-1.95, 1.7, -2.8],
+    book: [1.65, 0.7, -1.15],
+    painting: [1.72, 1.9, -2.7],
+    safe: [3.15, 0.6, 1.7],
+    door: [3.3, 1.4, -2.7],
+  };
+  let hitboxes = [],
+    doorPivot,
+    secret;
+  if (app) {
+    build();
+    Object.entries(groups).forEach(([id, g]) => (g.visible = id === "lounge"));
+    // An actual safe and door inhabit the space, rather than replacing it with a UI.
+    K.box(
+      room,
+      [0.9, 0.95, 0.75],
+      K.material("#303b38", { metalness: 0.5 }),
+      targets.safe,
+    );
+    K.box(
+      room,
+      [0.7, 0.7, 0.035],
+      K.material("#64766b", { metalness: 0.65 }),
+      [3.15, 0.6, 2.095],
+    );
+    K.cylinder(
+      room,
+      0.13,
+      0.13,
+      0.04,
+      mats.accent,
+      [3.33, 0.62, 2.15],
+      [Math.PI / 2, 0, 0],
+    );
+    K.box(room, [1.2, 2.8, 0.16], mats.black, [3.25, 1.4, -2.75]);
+    doorPivot = new THREE.Group();
+    doorPivot.position.set(2.67, 0, -2.63);
+    room.add(doorPivot);
+    K.box(doorPivot, [1.05, 2.62, 0.08], mats.wood, [0.525, 1.32, 0]);
+    K.sphere(doorPivot, 0.06, mats.accent, [0.86, 1.25, 0.08]);
+    const paper = K.texture((c, w, h) => {
+      c.fillStyle = "#f5e8c7";
+      c.fillRect(0, 0, w, h);
+      c.fillStyle = "#413e2e";
+      c.font = "38px serif";
+      c.fillText("If you forget,", 42, 150);
+      c.fillText("follow the light.", 42, 210);
+      c.font = "24px serif";
+      c.fillText("— yourself", 230, 380);
+    });
+    K.box(
+      room,
+      [0.65, 0.02, 0.46],
+      new THREE.MeshBasicMaterial({ map: paper }),
+      targets.letter,
+      [0, 0.2, 0],
+    );
+    K.box(room, [0.44, 0.09, 0.33], K.material("#6b793f"), targets.book);
+    const stars = K.texture((c, w, h) => {
+      c.clearRect(0, 0, w, h);
+      c.fillStyle = "#ffe7a4";
+      c.font = "bold 130px serif";
+      c.fillText("2 · 7 · 3", 12, 310);
+    });
+    secret = K.box(
+      room,
+      [2.1, 1.7, 0.01],
+      new THREE.MeshBasicMaterial({ map: stars, transparent: true }),
+      [-1.95, 1.7, -2.72],
+    );
+    for (const [id, pos] of Object.entries(targets)) {
+      const size =
+        id === "window"
+          ? [2.5, 2, 0.4]
+          : id === "painting"
+            ? [1.6, 1.7, 0.4]
+            : id === "door"
+              ? [1.1, 2.5, 0.4]
+              : id === "lamp"
+                ? [0.9, 0.8, 0.9]
+                : [0.95, 0.6, 0.95];
+      const b = K.box(
+        room,
+        size,
+        new THREE.MeshBasicMaterial({
+          transparent: true,
+          opacity: 0,
+          depthWrite: false,
+        }),
+        pos,
       );
-      plantGroup.visible = state.plants;
-      artGroup.visible = state.art;
-      const evening = state.daylight / 100;
-      lights.key.intensity = 1.9 - evening * 1.5;
-      lights.key.color.set(evening > 0.65 ? "#f9bc85" : "#fff5e3");
-      lights.hemi.intensity = 0.75 - evening * 0.45;
-      lampLight.intensity = state.lamp ? 1.2 + evening * 2 : 0;
+      b.userData.id = id;
+      hitboxes.push(b);
+    }
+  }
+  const titles = {
+    letter: "Письмо себе",
+    lamp: "Свет мешает видеть",
+    window: "По ту сторону стекла",
+    book: "На полях книги",
+    painting: "Незаконченный пейзаж",
+    safe: "То, что ты спрятал",
+    door: "Последний шаг",
+  };
+  const notes = {
+    letter:
+      "«Первые три — на стекле в темноте. Последняя — в книге. Картина скажет, зачем уходить».",
+    window: "На стекле проступает: 2 · 7 · 3. Слева направо.",
+    book: "«Неделю без воскресенья. Это твоя последняя цифра».",
+    painting:
+      "За рамой: «Этот дом — не ловушка. Это место, куда можно вернуться».",
+  };
+  function save() {
+    try {
+      localStorage.setItem("room404-v3", JSON.stringify(state));
+    } catch {}
+  }
+  function clue(id) {
+    if (!state.clues.includes(id)) {
+      state.clues.push(id);
+      save();
+    }
+  }
+  function sync() {
+    document.body.classList.toggle("escaped", state.escaped);
+    document.getElementById("clue-count").textContent =
+      state.clues.length + " / 4";
+    const list = document.getElementById("clues");
+    list.replaceChildren();
+    if (!state.clues.length) {
+      const li = document.createElement("li");
+      li.textContent = "Пока пусто. Начни с письма.";
+      list.append(li);
+    }
+    for (const id of state.clues) {
+      const li = document.createElement("li");
+      li.textContent = notes[id];
+      list.append(li);
+    }
+    document.getElementById("inventory").textContent = state.escaped
+      ? "ДВЕРЬ ОТКРЫТА"
+      : state.key
+        ? "В КАРМАНЕ: ЛАТУННЫЙ КЛЮЧ"
+        : "КАРМАНЫ ПУСТЫ";
+    document.getElementById("chapter").textContent = state.escaped
+      ? "04 / ТЫ ДОМА"
+      : state.key
+        ? "03 / ВЫХОД РЯДОМ"
+        : state.clues.length
+          ? "02 / СЛЕДУЙ СВЕТУ"
+          : "01 / ПРОБУЖДЕНИЕ";
+    if (app) {
+      lampLight.intensity = state.lamp ? 1.8 : 0;
       mats.bulb.emissiveIntensity = state.lamp ? 1 : 0;
+      lights.key.intensity = state.lamp ? 1.8 : 0.6;
+      lights.hemi.intensity = state.lamp ? 0.65 : 0.32;
+      secret.visible = !state.lamp;
+      doorPivot.rotation.y = state.escaped ? -Math.PI * 0.6 : 0;
       app.invalidate();
     }
-    document.querySelectorAll("[data-layout]").forEach((b) => {
-      const active = b.dataset.layout === state.layout;
-      b.classList.toggle("active", active);
-      b.setAttribute("aria-pressed", String(active));
-    });
-    document.querySelectorAll("[data-palette]").forEach((b) => {
-      const active = b.dataset.palette === state.palette;
-      b.classList.toggle("active", active);
-      b.setAttribute("aria-pressed", String(active));
-    });
-    document.getElementById("daylight").value = state.daylight;
-    document.getElementById("light-label").textContent =
-      state.daylight < 35
-        ? "Утро"
-        : state.daylight < 70
-          ? "После полудня"
-          : "Вечер";
-    ["lamp", "plant", "art"].forEach(
-      (k) =>
-        (document.getElementById(`${k}-toggle`).checked =
-          state[k === "plant" ? "plants" : k]),
-    );
-    document.getElementById("room-label").textContent =
-      `ROOM ${["lounge", "reading", "work"].indexOf(state.layout) + 1} / ${p.label.toUpperCase()}`;
-    if (storageAvailable && dirty)
-      document.getElementById("room-status").textContent =
-        "Комната изменилась. Сохрани, чтобы продолжить с этих решений позже.";
-    if (!storageAvailable)
-      document.getElementById("room-status").textContent =
-        "Хранилище недоступно. Комната работает в этой вкладке; решения можно скачать.";
   }
-  function focusDetail() {
-    if (!app) return;
-    const poses = {
-      lounge: [
-        [7, 4, 7],
-        [0.5, 0.8, -0.2],
-      ],
-      reading: [
-        [2.5, 3.7, 5],
-        [-1.3, 1, -1.2],
-      ],
-      work: [
-        [5, 4, 5],
-        [0, 0.8, -0.6],
-      ],
-    };
-    app.view(...poses[state.layout]);
+  function action(label, fn) {
+    const b = document.createElement("button");
+    b.className = "primary";
+    b.textContent = label;
+    b.addEventListener("click", fn);
+    document.getElementById("object-actions").append(b);
+  }
+  function inspect(id, focus = true) {
+    selected = id;
+    state.visited = Array.from(new Set([...state.visited, id]));
     document
-      .getElementById("main")
-      .scrollIntoView({ behavior: K.reduced ? "instant" : "smooth" });
-  }
-  document.querySelectorAll("[data-layout]").forEach((b) =>
-    b.addEventListener("click", () => {
-      state.layout = b.dataset.layout;
-      dirty = true;
-      sync();
-      focusDetail();
-    }),
-  );
-  document.querySelectorAll("[data-palette]").forEach((b) =>
-    b.addEventListener("click", () => {
-      state.palette = b.dataset.palette;
-      dirty = true;
-      sync();
-    }),
-  );
-  document.getElementById("daylight").addEventListener("input", (e) => {
-    state.daylight = Number(e.target.value);
-    dirty = true;
-    sync();
-  });
-  ["lamp", "plant", "art"].forEach((k) =>
-    document.getElementById(`${k}-toggle`).addEventListener("change", (e) => {
-      state[k === "plant" ? "plants" : k] = e.target.checked;
-      dirty = true;
-      sync();
-    }),
-  );
-  document
-    .getElementById("focus-detail")
-    .addEventListener("click", focusDetail);
-  document.querySelectorAll("[data-orbit]").forEach((b) =>
-    b.addEventListener("click", () => {
-      if (!orbit) return;
-      if (b.dataset.orbit === "reset") orbit.reset();
-      else orbit.step(b.dataset.orbit);
-    }),
-  );
-  document.getElementById("save-room").addEventListener("click", () => {
-    try {
-      localStorage.setItem(storageKey, JSON.stringify(state));
-      dirty = false;
-      document.getElementById("room-status").textContent =
-        "Твоя комната сохранена. Она встретит тебя при следующем открытии.";
-    } catch {
-      storageAvailable = false;
-      sync();
+      .querySelectorAll("[data-object]")
+      .forEach((b) =>
+        b.setAttribute("aria-pressed", String(b.dataset.object === id)),
+      );
+    document.getElementById("object-title").textContent = titles[id];
+    document.getElementById("feedback").textContent = "";
+    document.getElementById("object-actions").replaceChildren();
+    document.getElementById("safe-form").hidden = id !== "safe" || state.key;
+    let text = "";
+    if (id === "letter") {
+      clue(id);
+      text = notes[id];
     }
-  });
+    if (id === "lamp") {
+      text =
+        "Иногда нужно убрать свет, чтобы заметить то, что всегда было рядом.";
+      action(state.lamp ? "Выключить лампу" : "Включить лампу", () => {
+        state.lamp = !state.lamp;
+        save();
+        inspect("lamp", false);
+      });
+    }
+    if (id === "window") {
+      if (state.lamp)
+        text =
+          "В стекле отражается лампа. За отражением что-то написано, но разобрать невозможно.";
+      else {
+        clue(id);
+        text = notes[id];
+      }
+    }
+    if (id === "book") {
+      clue(id);
+      text = notes[id];
+    }
+    if (id === "painting") {
+      clue(id);
+      text = notes[id];
+    }
+    if (id === "safe") {
+      text = state.key
+        ? "На бархатной подкладке осталось углубление от ключа. Теперь он у тебя."
+        : "Сейф ждёт четырёх цифр. В комнате есть всё, что нужно, чтобы их найти.";
+    }
+    if (id === "door") {
+      text = state.escaped
+        ? "Снаружи пахнет дождём. Ты не сбежал — ты вспомнил дорогу домой."
+        : state.key
+          ? "В замке подходит тот самый латунный ключ."
+          : "Дверь не заперта кодом. Нужен настоящий ключ.";
+      if (state.key && !state.escaped)
+        action("Повернуть ключ и выйти", () => {
+          state.escaped = true;
+          save();
+          inspect("door", false);
+        });
+      if (state.escaped) action("Ещё одна попытка", reset);
+    }
+    document.getElementById("object-text").textContent = text;
+    if (app && focus) {
+      const t = targets[id];
+      const pos = [t[0] + 4.5, t[1] + 3.2, t[2] + 6.5];
+      app.view(pos, t, 550);
+    }
+    sync();
+  }
+  function reset() {
+    state = initial();
+    save();
+    selected = null;
+    home();
+    inspect("letter", false);
+    document.getElementById("hint-text").textContent = "";
+    document.getElementById("safe-code").value = "";
+  }
+  function home() {
+    if (app)
+      app.view(innerWidth < 700 ? [11, 10, 15] : [10, 8, 12], [0, 0.8, 0]);
+  }
   document
-    .getElementById("export-room")
-    .addEventListener("click", () =>
-      K.download(
-        "hush-room.txt",
-        `HUSH — моя комната\nЗанятие: ${{ lounge: "Быть вместе", reading: "Читать у окна", work: "Поймать мысль" }[state.layout]}\nМатериалы: ${palettes[state.palette].label}\nВремя дня: ${document.getElementById("light-label").textContent}\nЛампа: ${state.lamp ? "включена" : "выключена"}\nРастения: ${state.plants ? "да" : "нет"}\nРисунок: ${state.art ? "да" : "нет"}\n\nКонцептуальный эскиз комнаты. Предметы концептуальные, покупки не оформляются.\n`,
-        "text/plain;charset=utf-8",
-      ),
-    );
+    .querySelectorAll("[data-object]")
+    .forEach((b) => (b.onclick = () => inspect(b.dataset.object)));
+  document.getElementById("restart").onclick = reset;
+  document.getElementById("view-home").onclick = home;
+  for (const [id, dir] of [
+    ["view-left", -1],
+    ["view-right", 1],
+  ])
+    document.getElementById(id).onclick = () => {
+      if (!app) return;
+      const d = app.camera.position.clone().sub(app.target);
+      d.applyAxisAngle(new THREE.Vector3(0, 1, 0), dir * 0.3);
+      app.view(d.add(app.target).toArray(), app.target.toArray(), 300);
+    };
+  document.getElementById("safe-form").onsubmit = (e) => {
+    e.preventDefault();
+    if (document.getElementById("safe-code").value === "2736") {
+      state.key = true;
+      save();
+      inspect("safe", false);
+      document.getElementById("feedback").textContent =
+        "Щелчок. Ты забрал ключ.";
+    } else
+      document.getElementById("feedback").textContent =
+        "Замок не поддался. Первые три цифры — на окне, четвёртая — в книге.";
+  };
+  document.getElementById("hint").onclick = () => {
+    state.hints++;
+    save();
+    document.getElementById("hint-text").textContent = state.escaped
+      ? "Ты уже снаружи. Можно начать заново."
+      : state.key
+        ? "Ключ подходит к двери справа."
+        : !state.clues.includes("letter")
+          ? "Прочитай письмо на столе."
+          : state.lamp
+            ? "Выключи лампу. Потом проверь окно."
+            : !state.clues.includes("window")
+              ? "На стекле теперь видны три цифры."
+              : !state.clues.includes("book")
+                ? "В книге спрятана последняя цифра."
+                : state.hints > 4
+                  ? "Неделя без воскресенья — шесть дней. Код: 2736."
+                  : "Соедини цифры с окна и число дней из книги.";
+  };
+  if (app) {
+    const ray = new THREE.Raycaster(),
+      pointer = new THREE.Vector2();
+    canvas.addEventListener("pointerup", (e) => {
+      const r = canvas.getBoundingClientRect();
+      pointer.set(
+        ((e.clientX - r.left) / r.width) * 2 - 1,
+        (-(e.clientY - r.top) / r.height) * 2 + 1,
+      );
+      ray.setFromCamera(pointer, app.camera);
+      const hit = ray.intersectObjects(hitboxes)[0];
+      if (hit) inspect(hit.object.userData.id);
+    });
+  }
   sync();
-  window.hush = {
+  if (state.escaped) inspect("door", false);
+  else if (state.key) inspect("safe", false);
+  home();
+  window.room404 = {
     get state() {
-      return state;
+      return structuredClone(state);
     },
     app,
-    sync,
+    inspect,
   };
 })();

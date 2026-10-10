@@ -1,488 +1,308 @@
-:root {
-  --paper: #071b24;
-  --ink: #e6f1ee;
-  --accent: #e9d366;
-  background: var(--paper);
-  color: var(--ink);
+body {
+  --bg: #051f2a;
+  --fg: #e4f0e8;
+  --muted: #a4c3c5;
+  --surface: #163c46;
+  --hover: #285563;
+  --accent: #dce98e;
+  --on-accent: #102a29;
+  --line: #2b4d55;
 }
-.site-header .brand {
-  letter-spacing: -0.02em;
+header {
+  background: #071f29;
 }
-.site-header .brand .mono {
-  font-size: 9px;
-  color: #a7c5cb;
+.ocean-app {
+  height: calc(100svh - 78px);
+  min-height: 650px;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) 138px;
 }
-.site-header nav {
-  color: #c5d9da;
+.scene-area {
+  background: #052432;
 }
-.story {
-  height: 560svh;
-  position: relative;
-}
-.story-viewport {
-  position: sticky;
-  top: 0;
-  height: 100svh;
-  min-height: 690px;
-  overflow: hidden;
-  background: #071b24;
-}
-.ocean-scene {
+.hud {
   position: absolute;
-  inset: 0;
-}
-#ocean-canvas {
-  width: 100%;
-  height: 100%;
-}
-.chapter-copy {
-  position: relative;
-  z-index: 2;
-  padding: 135px 0 115px 4.5%;
-  width: 43%;
-  max-width: 650px;
+  left: 30px;
+  right: 30px;
+  top: 22px;
+  display: flex;
+  gap: 36px;
   pointer-events: none;
 }
-.chapter-copy button {
-  pointer-events: auto;
-}
-.chapter-copy h1 {
-  font-size: clamp(98px, 12vw, 190px);
-  font-weight: 600;
-  line-height: 0.9;
-  letter-spacing: -0.09em;
-  margin: 28px 0 42px;
-}
-.chapter-text {
-  max-width: 350px;
-}
-.chapter-text .mono {
-  color: var(--accent);
-}
-.chapter-text h2 {
-  font-size: clamp(28px, 3.2vw, 43px);
-  line-height: 1.12;
-  letter-spacing: -0.04em;
-  font-weight: 400;
-  margin: 18px 0;
-}
-.chapter-text p {
-  font-size: 13px;
-  line-height: 1.75;
-  color: #b6ccd0;
-  max-width: 305px;
-  min-height: 90px;
-}
-.chapter-copy .button {
-  border: 0;
-  background: var(--accent);
-  color: #142630;
-  margin-top: 7px;
-}
-.chapter-copy .button:disabled {
-  opacity: 1;
-  background: #bed0c4;
-}
-#action-status {
-  font-size: 11px;
-  color: #ccddd9;
-  max-width: 300px;
-  min-height: 30px;
-}
-.chapter-text.changing {
-  animation: chapterIn 0.45s both;
-}
-@keyframes chapterIn {
-  from {
-    opacity: 0.3;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-.depth-meter {
-  position: absolute;
-  right: 4.5%;
-  top: 130px;
-  bottom: 140px;
+.hud > div {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  align-items: center;
-  width: 62px;
-  color: #a7c8cf;
+  gap: 7px;
+  min-width: 90px;
 }
-.depth-track {
-  position: relative;
-  height: 100%;
-  width: 1px;
-  background: #537a8380;
-  min-height: 90px;
-}
-.depth-track::before {
-  content: "";
-  position: absolute;
-  inset: 0 -4px;
-  background: repeating-linear-gradient(
-    transparent 0 26px,
-    #9fbcc24d 26px 27px
-  );
-}
-#depth-fill {
-  position: absolute;
-  top: 0;
-  left: -1px;
-  width: 3px;
-  background: var(--accent);
-  height: 0;
-}
-.depth-meter strong {
-  font-family: "IBM Plex Mono", monospace;
+.hud output {
   font-size: 22px;
-  font-weight: 400;
-  color: var(--accent);
 }
-.depth-meter .mono {
-  font-size: 8px;
+.hud meter {
+  width: 105px;
+  height: 4px;
+  appearance: none;
+  border: 0;
+  background: #39555b;
 }
-.story-bottom {
+.hud meter::-webkit-meter-bar {
+  background: #39555b;
+  border: 0;
+  height: 4px;
+}
+.hud meter::-webkit-meter-optimum-value {
+  background: #dce98e;
+}
+.gate {
   position: absolute;
-  bottom: 23px;
-  left: 4.5%;
-  right: 4.5%;
-  z-index: 3;
+  left: 7%;
+  top: 23%;
+  width: 390px;
+  max-width: 75%;
+  padding: 20px 0;
+  background: linear-gradient(90deg, #052432eb, #052432b0 85%, transparent);
 }
-.story-bottom > p {
-  color: #c1d3d5;
-  font-size: 9px;
-  margin: 0 0 20px;
+.gate h2 {
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(56px, 7vw, 98px);
+  line-height: 0.92;
+  letter-spacing: -3px;
+  margin: 22px 0;
 }
-.chapter-nav {
+.gate p:not(.eyebrow) {
+  font-size: 14px;
+  max-width: 335px;
+  color: #c5d9d7;
+}
+.gate #start {
+  margin: 22px 0 14px;
+  min-width: 200px;
+}
+.gate .gate-help {
+  font-size: 11px !important;
+  line-height: 1.8;
+}
+.mission {
+  position: absolute;
+  left: 30px;
+  bottom: 26px;
+  max-width: 65%;
+  pointer-events: none;
+}
+.mission #target-label {
+  font-size: 17px;
+  margin: 7px 0;
+}
+.mission #message {
+  font-size: 12px;
+  color: #b8d2cc;
+  min-height: 20px;
+}
+.gate:not([hidden]) ~ .mission {
+  display: none;
+}
+.depth-ruler {
+  position: absolute;
+  right: 20px;
+  top: 32%;
+  font:
+    11px/4 "IBM Plex Mono",
+    monospace;
+  color: #97b7b9;
+  opacity: 0.7;
+}
+.flight-deck {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  border-top: 1px solid var(--line);
+  background: #092832;
+  padding: 14px 30px;
+  gap: 40px;
+}
+.chart {
+  min-width: 0;
+}
+.chart-caption {
   display: flex;
-  border-top: 1px solid #42636e;
-  gap: 30px;
-  padding-top: 14px;
   justify-content: space-between;
+  gap: 8px;
 }
-.chapter-nav button {
-  border: 0;
-  background: transparent;
-  color: #a8c4cb;
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  font-size: 11px;
-  text-align: left;
-  padding: 0;
-}
-.chapter-nav span {
-  font-family: "IBM Plex Mono", monospace;
-  color: #75939e;
-}
-.chapter-nav button.active,
-.chapter-nav button.active span {
-  color: var(--accent);
-}
-.journal {
-  padding: 95px 0;
-}
-.journal .section-top p {
-  color: #b3cbd0;
-}
-.journal-progress {
-  color: var(--accent);
-  margin: 0 0 24px;
-}
-.journal-entries {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.journal-entries li {
-  display: grid;
-  grid-template-columns: 50px 1fr 100px;
-  gap: 22px;
-  align-items: start;
-  padding: 28px 0;
-  border-top: 1px solid #355760;
-}
-.journal-entries h3 {
-  font-size: 21px;
-  font-weight: 400;
-  letter-spacing: -0.03em;
-  margin: 0 0 10px;
-}
-.journal-entries p {
+.chart-caption .mono {
   font-size: 12px;
-  color: #b6ccd0;
-  max-width: 650px;
-  margin: 0;
+  color: #c6d7d3;
 }
-.journal-entries .status {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 10px;
-  color: var(--accent);
-  text-align: right;
-}
-.journal-entries li.pending {
-  opacity: 0.75;
-}
-.journal-entries li:last-child {
-  border-bottom: 1px solid #355760;
-}
-.journal-actions {
-  display: flex;
-  gap: 25px;
-  flex-wrap: wrap;
-  align-items: center;
-  margin-top: 35px;
-}
-.journal-actions .button {
-  color: #142630;
-  background: var(--accent);
-  border: 0;
-}
-.text-button {
-  background: transparent;
-  color: #c4d9db;
-  border: 0;
-  border-bottom: 1px solid #5b7c84;
-  padding: 10px 0;
-  text-decoration: none;
-  font-size: 12px;
-  min-height: 44px;
-}
-#journal-status {
-  font-size: 12px;
-  color: #b3cbd0;
-}
-.blueprint {
-  background: #102d38;
-  padding: 85px 0;
-}
-.blueprint-inner {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 65px;
-  align-items: center;
-}
-.blueprint h2 {
-  font-size: clamp(32px, 4vw, 54px);
-  font-weight: 400;
-  letter-spacing: -0.04em;
-  line-height: 1.13;
-  margin: 20px 0;
-}
-.blueprint p {
-  font-size: 12px;
-  color: #b5cdd1;
-  max-width: 390px;
-}
-.blueprint svg {
+#map {
   width: 100%;
-  color: #9cc1c9;
+  height: 78px;
+  display: block;
+  margin-top: 8px;
 }
-.site-footer {
-  border-color: #355760;
-  margin-top: 25px;
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
-.button:hover {
-  filter: brightness(1.08);
+.controls button {
+  min-width: 65px;
+  user-select: none;
+  touch-action: none;
 }
-@media (max-width: 1050px) {
-  .chapter-copy {
-    padding-top: 130px;
-    width: 48%;
-  }
-  .chapter-copy h1 {
-    font-size: 130px;
-  }
-  .depth-meter {
-    right: 3%;
-    width: 40px;
-  }
-  .chapter-nav {
-    gap: 15px;
-  }
+.controls small {
+  color: var(--muted);
+  font-size: 10px;
 }
-@media (max-width: 650px) {
-  .site-header .brand .mono {
-    display: none;
+.pad {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.pad > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.pad button {
+  min-width: 44px;
+  width: 44px;
+  padding: 4px;
+  font-size: 19px;
+  height: 44px;
+}
+.pressed {
+  background: var(--accent) !important;
+  color: var(--on-accent) !important;
+}
+.gate.ending {
+  max-width: 80%;
+  background: #092832f2;
+  padding: 28px;
+  left: 5%;
+  width: 440px;
+  border-left: 2px solid var(--accent);
+}
+.ending h2 {
+  font-size: 60px;
+}
+.paused .scene-area:after {
+  content: "ПАУЗА";
+  position: absolute;
+  top: 42%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  pointer-events: none;
+  letter-spacing: 0.3em;
+  font:
+    24px "IBM Plex Mono",
+    monospace;
+  text-shadow: 0 1px 20px #000;
+}
+@media (max-width: 700px) {
+  .ocean-app {
+    height: calc(100svh - 68px);
+    min-height: 730px;
+    grid-template-rows: minmax(0, 1fr) 205px;
   }
-  .story {
-    height: 490svh;
+  .hud {
+    left: 18px;
+    right: 18px;
+    top: 18px;
+    gap: 16px;
+    justify-content: space-between;
   }
-  .story-viewport {
-    min-height: 740px;
+  .hud > div {
+    min-width: 0;
   }
-  .chapter-copy {
-    padding: 100px 5% 100px;
-    width: 100%;
-    max-width: none;
+  .hud output {
+    font-size: 17px;
   }
-  .chapter-copy > .eyebrow {
-    font-size: 8px;
+  .hud .eyebrow {
+    font-size: 9px;
+    letter-spacing: 0;
   }
-  .chapter-copy h1 {
-    font-size: 92px;
-    margin: 26px 0 26px;
+  .hud meter {
+    width: 65px;
   }
-  .chapter-text {
-    max-width: 245px;
+  .gate {
+    left: 22px;
+    top: 25%;
+    width: 300px;
+    max-width: 85%;
   }
-  .chapter-text h2 {
-    font-size: 27px;
+  .gate h2 {
+    font-size: 62px;
+    letter-spacing: -2px;
     margin: 16px 0;
   }
-  .chapter-text p {
+  .gate p:not(.eyebrow) {
     font-size: 12px;
-    max-width: 235px;
-    min-height: 90px;
+    max-width: 280px;
   }
-  .chapter-copy .button {
+  .gate #start {
+    margin: 17px 0 10px;
+  }
+  .gate .gate-help {
+    font-size: 10px !important;
+  }
+  .mission {
+    left: 18px;
+    bottom: 16px;
+    max-width: 82%;
+  }
+  .mission #target-label {
+    font-size: 14px;
+  }
+  .mission #message {
     font-size: 11px;
-    padding: 10px 16px;
   }
-  .ocean-scene {
-    left: -30%;
-    right: -20%;
-    top: 0;
-    bottom: 0;
+  .depth-ruler {
+    right: 12px;
+    font-size: 9px;
   }
-  .depth-meter {
-    right: 5%;
-    top: 120px;
-    bottom: 160px;
-    width: 40px;
-  }
-  .depth-meter strong {
-    font-size: 16px;
-  }
-  .depth-track {
-    max-height: 340px;
-  }
-  .story-bottom {
-    bottom: 20px;
-  }
-  .chapter-nav {
-    gap: 8px;
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-  }
-  .chapter-nav button {
+  .flight-deck {
+    display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 7px;
-    font-size: 8px;
-    line-height: 1.35;
+    padding: 12px 18px;
+    gap: 10px;
   }
-  .chapter-nav span {
-    font-size: 11px;
+  .chart-caption .eyebrow {
+    font-size: 9px;
   }
-  .story-bottom > p {
-    font-size: 8px;
+  #map {
+    height: 50px;
+    margin-top: 5px;
   }
-  .journal {
-    padding: 60px 0;
+  .controls {
+    justify-content: center;
+    gap: 14px;
   }
-  .journal-entries li {
-    grid-template-columns: 25px 1fr;
-    gap: 12px;
+  .controls > button {
+    min-height: 74px;
   }
-  .journal-entries .status {
-    grid-column: 2;
-    text-align: left;
+  .gate.ending {
+    padding: 20px;
+    left: 18px;
   }
-  .journal-entries h3 {
-    font-size: 20px;
-  }
-  .blueprint-inner {
-    grid-template-columns: 1fr;
-    gap: 35px;
-  }
-  .blueprint {
-    padding: 60px 0;
-  }
-  #action-status {
-    font-size: 10px;
-    max-width: 220px;
-  }
-  .journal-actions {
-    gap: 15px;
-  }
-  .journal-actions .button {
-    width: 100%;
+  .ending h2 {
+    font-size: 46px;
   }
 }
-@media (min-width: 651px) and (max-height: 800px) {
-  .story-viewport {
-    min-height: 600px;
+.ocean-app {
+  grid-template-columns: minmax(0, 1fr);
+}
+.flight-deck {
+  min-width: 0;
+}
+@media (max-width: 700px) {
+  .controls {
+    gap: 10px;
   }
-  .chapter-copy {
-    padding-top: 105px;
-  }
-  .chapter-copy h1 {
-    font-size: 105px;
-    margin: 20px 0 24px;
-  }
-  .chapter-text h2 {
-    font-size: 31px;
-    margin: 14px 0;
-  }
-  .chapter-text p {
+  .controls > button {
     font-size: 12px;
-    min-height: 65px;
+    padding: 10px;
   }
-  .chapter-copy .button {
-    margin-top: 0;
-  }
-  #action-status {
-    font-size: 10px;
-    line-height: 1.5;
-  }
-  .depth-meter {
-    top: 110px;
-    bottom: 140px;
-  }
-  .story-bottom {
-    bottom: 18px;
-  }
-}
-@media (max-width: 650px) and (max-height: 760px) {
-  .story-viewport {
-    min-height: 600px;
-  }
-  .chapter-copy {
-    padding-top: 82px;
-  }
-  .chapter-copy h1 {
-    font-size: 76px;
-    margin: 18px 0 21px;
-  }
-  .chapter-text h2 {
-    font-size: 25px;
-    margin: 12px 0;
-  }
-  .chapter-text p {
-    min-height: 65px;
-    margin-bottom: 14px;
-  }
-  .chapter-copy .button {
-    margin-top: 0;
-  }
-  .depth-meter {
-    top: 100px;
-    bottom: 150px;
-  }
-  .story-bottom {
-    bottom: 15px;
-  }
-  .story-bottom > p {
-    margin-bottom: 12px;
-  }
-  #action-status {
-    margin-top: 8px;
+  .pad button {
+    width: 42px;
+    min-width: 42px;
   }
 }

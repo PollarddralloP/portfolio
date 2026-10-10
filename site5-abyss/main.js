@@ -1,92 +1,63 @@
 (() => {
   const K = SceneKit,
-    canvas = document.getElementById("ocean-canvas"),
-    story = document.getElementById("mission");
-  const chapters = [
-    {
-      name: "Поверхность",
-      title: "Вниз,\nк невидимому.",
-      description:
-        "Один аппарат, пять остановок. Прокрути страницу, чтобы уйти с поверхности и собрать историю глубины.",
-      action: "Подготовить аппарат",
-      result: "Аппарат подготовлен. Первая запись появилась в журнале.",
-      note: "Проверены обзорная сфера, свет и контейнер для образцов. Маршрут готов.",
-      depth: 0,
-    },
-    {
-      name: "Сумерки",
-      title: "Поверхность\nстала воспоминанием.",
-      description:
-        "Солнечный свет остаётся наверху. Проверь связь перед следующим участком маршрута.",
-      action: "Проверить связь",
-      result: "Связь установлена. Можно продолжать погружение.",
-      note: "Установлен канал связи с поверхностью. В модели сигнал проходит через буи маршрута.",
-      depth: 600,
-    },
-    {
-      name: "Свет",
-      title: "Здесь темнота\nумеет светиться.",
-      description:
-        "Перед аппаратом появилась колония светящихся форм. Подсвети её мягко и сохрани наблюдение.",
-      action: "Наблюдать колонию",
-      result: "Колония отмечена. Светящиеся формы появились рядом с аппаратом.",
-      note: "Зафиксирован рисунок светящейся колонии. Это художественные формы, созданные для экспедиции.",
-      depth: 1400,
-    },
-    {
-      name: "Дно",
-      title: "У каждого следа\nесть история.",
-      description:
-        "На дне лежит слоистый фрагмент. Направь манипулятор и добавь его в контейнер.",
-      action: "Взять образец",
-      result: "Образец в контейнере. Манипулятор закончил работу.",
-      note: "В контейнер помещён условный минеральный фрагмент. Наблюдение: слои и различие оттенков.",
-      depth: 2400,
-    },
-    {
-      name: "Возвращение",
-      title: "Глубина остаётся.\nТы возвращаешься.",
-      description:
-        "Подготовь маршрут наверх. Самое важное теперь — собрать наблюдения в одну историю.",
-      action: "Завершить маршрут",
-      result: "Маршрут завершён. Журнал готов к скачиванию ниже.",
-      note: "Аппарат вернулся к поверхности. Доступные наблюдения собраны в журнал экспедиции.",
-      depth: 0,
-    },
-  ];
-  let completed = new Set(),
-    storageAvailable = true,
-    current = -1,
-    progress = 0;
-  const storageKey = "abyss-expedition-v1";
-  try {
-    const saved = JSON.parse(localStorage.getItem(storageKey) || "[]");
-    if (Array.isArray(saved))
-      saved
-        .filter((n) => Number.isInteger(n) && n >= 0 && n < 5)
-        .forEach((n) => completed.add(n));
-  } catch {
-    storageAvailable = false;
-  }
+    canvas = document.getElementById("ocean-canvas");
   const app = K.create(canvas, {
-    background: "#0d3543",
-    position: [9, 4.5, 14],
-    target: [0, 0, 0],
-    fov: 41,
+    background: "#052b3a",
+    position: [8, 6, 18],
+    target: [2, 0, 0],
+    fov: 48,
     shadows: false,
   });
-  let sub, terrain, colony, sample, arm, beam, headlight, particles, ambient;
+  const origin = () => ({
+    x: 0,
+    y: 0,
+    oxygen: 100,
+    hull: 100,
+    collected: [],
+    time: 0,
+    status: "ready",
+    sonar: 0,
+    hits: 0,
+    boost: 0,
+  });
+  let state = origin(),
+    keys = new Set(),
+    sub,
+    arm,
+    beam,
+    particles,
+    station,
+    sonarRing,
+    objects = [],
+    hazards = [],
+    last = 0,
+    raf = 0,
+    invulnerable = 0,
+    sonarUntil = 0,
+    seed = 781;
+  const sites = [
+      [13, -3],
+      [27, -7],
+      [41, -2],
+      [56, -10],
+      [71, -5],
+    ],
+    names = [
+      "Спора рассвета",
+      "Светящийся кварц",
+      "Сердце полипа",
+      "Чёрный жемчуг",
+      "Последний огонёк",
+    ];
+  function random() {
+    seed = (seed * 1664525 + 1013904223) >>> 0;
+    return seed / 4294967296;
+  }
   function build() {
     const s = app.scene;
-    s.fog = new THREE.FogExp2("#0d3543", 0.025);
-    ambient = new THREE.HemisphereLight("#86bbcb", "#061820", 1.4);
-    s.add(ambient);
-    const key = new THREE.DirectionalLight("#c3e6ef", 2);
-    key.position.set(-5, 10, 8);
-    s.add(key);
+    s.fog = new THREE.FogExp2("#052b3a", 0.022);
+    app.lights({ sun: "#b9eff5", power: 1.8, ambient: 1, pos: [10, 18, 7] });
     sub = new THREE.Group();
-    sub.position.set(2, 0, 0);
-    sub.rotation.y = -0.48;
     s.add(sub);
     const yellow = K.material("#d9b94a", { metalness: 0.25, roughness: 0.42 }),
       dark = K.material("#233b40", { metalness: 0.5, roughness: 0.4 }),
@@ -179,297 +150,453 @@
       emissiveIntensity: 2,
     });
     for (const z of [-0.65, 0.65]) K.sphere(sub, 0.15, bulb, [1.52, -0.67, z]);
-    headlight = new THREE.SpotLight("#c7e2ca", 8, 20, 0.45, 0.8, 1);
-    headlight.position.set(3, -0.4, 0);
-    headlight.target.position.set(7, -4, 0);
-    s.add(headlight, headlight.target);
+
     beam = K.mesh(
       sub,
-      new THREE.ConeGeometry(2.2, 8, 40, 1, true),
+      new THREE.ConeGeometry(2, 8, 28, 1, true),
       new THREE.MeshBasicMaterial({
-        color: "#bad8b7",
+        color: "#def3b2",
         transparent: true,
-        opacity: 0.055,
+        opacity: 0.07,
         side: THREE.DoubleSide,
         depthWrite: false,
       }),
-      [5, -1.8, 0],
-      [0, 0, Math.PI / 2 - 0.3],
+      [5, -0.7, 0],
+      [0, 0, Math.PI / 2],
     );
-    terrain = new THREE.Group();
-    terrain.position.y = -8;
-    s.add(terrain);
-    const seabed = new THREE.PlaneGeometry(65, 45, 45, 30);
-    const pos = seabed.attributes.position;
-    for (let i = 0; i < pos.count; i++) {
-      const x = pos.getX(i),
-        y = pos.getY(i);
+    const light = new THREE.PointLight("#e6ecae", 3, 18);
+    light.position.set(3, 0, 0);
+    sub.add(light);
+    sub.scale.setScalar(0.65);
+    sonarRing = K.mesh(
+      s,
+      new THREE.TorusGeometry(1, 0.035, 8, 64),
+      new THREE.MeshBasicMaterial({
+        color: "#dce98e",
+        transparent: true,
+        opacity: 0.65,
+      }),
+      [0, 0, 0],
+      [Math.PI / 2, 0, 0],
+    );
+    sonarRing.visible = false;
+    station = new THREE.Group();
+    s.add(station);
+    K.cylinder(
+      station,
+      1.8,
+      1.8,
+      0.7,
+      K.material("#466569", { metalness: 0.7 }),
+      [0, -1, 0],
+    );
+    K.mesh(
+      station,
+      new THREE.TorusGeometry(2, 0.17, 16, 64),
+      K.material("#cbe986", {
+        emissive: K.color("#cbe986"),
+        emissiveIntensity: 1,
+      }),
+      [0, 0, 0],
+      [Math.PI / 2, 0, 0],
+    );
+    K.box(station, [2.4, 2.5, 0.5], K.material("#253e47"), [-1, 0, -2.4]);
+    const bed = new THREE.PlaneGeometry(160, 65, 90, 35),
+      pos = bed.attributes.position;
+    for (let i = 0; i < pos.count; i++)
       pos.setZ(
         i,
-        Math.sin(x * 0.6) * Math.cos(y * 0.5) * 0.5 +
-          Math.sin(x * 0.21 + y * 0.31) * 0.8,
+        Math.sin(pos.getX(i) * 0.21) * Math.cos(pos.getY(i) * 0.17) * 1.8,
       );
-    }
-    seabed.computeVertexNormals();
+    bed.computeVertexNormals();
     K.mesh(
-      terrain,
-      seabed,
-      K.material("#27413d", { flatShading: true }),
-      [0, 0, 0],
+      s,
+      bed,
+      K.material("#143d44", { flatShading: true }),
+      [35, -16, -5],
       [-Math.PI / 2, 0, 0],
     );
-    let seed = 341;
-    function random() {
-      seed = (seed * 1664525 + 1013904223) >>> 0;
-      return seed / 4294967296;
-    }
-    for (let i = 0; i < 38; i++) {
-      const m = K.mesh(
-        terrain,
-        new THREE.DodecahedronGeometry(0.4 + random() * 0.8, 0),
-        K.material(i % 2 ? "#3d5850" : "#526059", { flatShading: true }),
-        [(random() - 0.5) * 34, 0.25, (random() - 0.5) * 22],
+    for (let i = 0; i < 85; i++) {
+      const x = random() * 100 - 8,
+        z = -6 - random() * 24,
+        h = 3 + random() * 14;
+      const rock = K.mesh(
+        s,
+        new THREE.DodecahedronGeometry(1.5, 0),
+        K.material(i % 2 ? "#204b52" : "#315b5e", { flatShading: true }),
+        [x, -16 + h * 0.35, z],
       );
-      m.scale.set(1 + random(), 0.6 + random(), 1 + random());
-      m.rotation.set(random(), random(), random());
+      rock.scale.set(1 + random() * 2, h / 2, 1 + random() * 2);
+      rock.rotation.y = random() * 6;
     }
-    colony = new THREE.Group();
-    colony.position.set(4, -1.8, 2);
-    s.add(colony);
-    for (let i = 0; i < 14; i++) {
-      const x = (random() - 0.5) * 4,
-        z = (random() - 0.5) * 2,
-        height = 0.4 + random() * 1.2;
-      K.cylinder(colony, 0.018, 0.025, height, K.material("#406f65"), [
-        x,
-        height / 2,
-        z,
-      ]);
-      const glow = K.material("#b4d9bd", {
-        emissive: K.color("#81dbb1"),
-        emissiveIntensity: 1.2,
+    for (let i = 0; i < sites.length; i++) {
+      const g = new THREE.Group();
+      g.position.set(sites[i][0], sites[i][1], 0);
+      s.add(g);
+      const glow = K.material("#e2f2a0", {
+        emissive: K.color("#cee982"),
+        emissiveIntensity: 1.7,
+        metalness: 0.2,
+        roughness: 0.3,
       });
-      const cap = K.sphere(colony, 0.22, glow, [x, height, z], [1, 0.4, 1]);
+      K.mesh(g, new THREE.IcosahedronGeometry(0.65, 1), glow);
       K.mesh(
-        colony,
-        new THREE.TorusGeometry(0.18, 0.018, 8, 20),
+        g,
+        new THREE.TorusGeometry(1, 0.025, 8, 40),
         glow,
-        [x, height - 0.035, z],
+        [0, 0, 0],
         [Math.PI / 2, 0, 0],
       );
+      objects.push(g);
     }
-    sample = K.mesh(
-      sub,
-      new THREE.IcosahedronGeometry(0.24, 0),
-      K.material("#b6ad83", { flatShading: true }),
-      [0.45, -0.95, 1.22],
-    );
-    const points = new Float32Array(330 * 3);
-    for (let i = 0; i < points.length; i++) points[i] = (random() - 0.5) * 38;
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute("position", new THREE.BufferAttribute(points, 3));
-    particles = new THREE.Points(
-      geometry,
-      new THREE.PointsMaterial({
-        color: "#bfdcdb",
-        size: 0.035,
+    for (let i = 0; i < 12; i++) {
+      const x = 9 + i * 5.8,
+        y = -2 - ((i * 3) % 10);
+      const g = new THREE.Group();
+      g.position.set(x, y, -0.2);
+      s.add(g);
+      const pink = K.material("#dba8d5", {
         transparent: true,
-        opacity: 0.3,
+        opacity: 0.66,
+        emissive: K.color("#885286"),
+        emissiveIntensity: 0.8,
+      });
+      K.sphere(g, 0.9, pink, [0, 0, 0], [1, 0.6, 1]);
+      for (let t = 0; t < 7; t++) {
+        const angle = (t * Math.PI * 2) / 7;
+        const points = [];
+        for (let j = 0; j < 9; j++)
+          points.push(
+            new THREE.Vector3(
+              Math.cos(angle) * (0.4 + j * 0.03) + Math.sin(j) * 0.12,
+              -j * 0.28,
+              Math.sin(angle) * 0.4,
+            ),
+          );
+        const line = new THREE.Line(
+          new THREE.BufferGeometry().setFromPoints(points),
+          new THREE.LineBasicMaterial({
+            color: "#cf9eca",
+            transparent: true,
+            opacity: 0.65,
+          }),
+        );
+        g.add(line);
+      }
+      hazards.push({ g, x, y });
+    }
+    const points = new Float32Array(1800);
+    for (let i = 0; i < 600; i++) {
+      points[i * 3] = random() * 130 - 20;
+      points[i * 3 + 1] = random() * 38 - 18;
+      points[i * 3 + 2] = random() * 42 - 22;
+    }
+    particles = new THREE.Points(
+      new THREE.BufferGeometry().setAttribute(
+        "position",
+        new THREE.BufferAttribute(points, 3),
+      ),
+      new THREE.PointsMaterial({
+        color: "#a8dcd9",
+        size: 0.04,
+        transparent: true,
+        opacity: 0.6,
       }),
     );
     s.add(particles);
-  }
-  if (app) build();
-  function renderScene() {
-    if (!app) return;
-    const phase = Math.min(4, progress * 5),
-      idx = Math.min(4, Math.floor(phase)),
-      fraction = phase - idx;
-    const colors = ["#0d3543", "#082632", "#061c28", "#081b21", "#15414c"];
-    const a = K.color(colors[idx]),
-      b = K.color(colors[Math.min(4, idx + 1)]);
-    app.scene.background.copy(a.lerp(b, fraction));
-    app.scene.fog.color.copy(app.scene.background);
-    sub.rotation.y = -0.48 + Math.sin(phase * 0.8) * 0.23;
-    sub.rotation.z = phase < 4 ? -0.09 * Math.sin(phase) : 0.08;
-    sub.position.y = Math.sin(phase * 1.2) * 0.22;
-    terrain.position.y = -9 + Math.min(phase / 3, 1) * 6;
-    terrain.visible = phase > 1.6;
-    terrain.traverse((o) => {
-      if (o.material) {
-        o.material.transparent = true;
-        o.material.opacity = Math.max(0, Math.min(1, (phase - 1.6) / 1.1));
-      }
-    });
-    colony.visible = idx === 2 || idx === 3;
-    colony.children.forEach((o, i) => (o.scale.y = completed.has(2) ? 1 : 0.5));
-    sample.visible = completed.has(3);
-    arm.rotation.z = completed.has(3) ? -0.6 : 0;
-    particles.position.y = (phase * 2) % 6;
-    beam.visible = idx > 0 && idx < 4;
-    ambient.intensity = idx === 0 || idx === 4 ? 1.4 : 0.85;
     app.invalidate();
   }
-  function renderChapter(index) {
-    if (current === index) return;
-    current = index;
-    const c = chapters[index];
-    document.getElementById("chapter-number").textContent =
-      `0${index + 1} / ${c.name.toUpperCase()}`;
-    const title = document.getElementById("chapter-title");
-    title.replaceChildren();
-    c.title.split("\n").forEach((line, i) => {
-      if (i) title.append(document.createElement("br"));
-      title.append(document.createTextNode(line));
-    });
-    document.getElementById("chapter-description").textContent = c.description;
-    const text = document.getElementById("chapter-text");
-    text.classList.remove("changing");
-    if (!K.reduced) {
-      void text.offsetWidth;
-      text.classList.add("changing");
+  if (app) build();
+  else document.getElementById("start").disabled = true;
+  const map = document.getElementById("map"),
+    ctx = map.getContext("2d");
+  function chart() {
+    const r = map.getBoundingClientRect();
+    map.width = Math.max(1, Math.round(r.width * devicePixelRatio));
+    map.height = Math.max(1, Math.round(r.height * devicePixelRatio));
+    ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+    const w = r.width,
+      h = r.height,
+      X = (x) => 14 + (x / 80) * (w - 28),
+      Y = (y) => 8 + ((3 - y) / 16) * (h - 16);
+    ctx.clearRect(0, 0, w, h);
+    ctx.strokeStyle = "#34525a";
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 4; i++) {
+      ctx.beginPath();
+      ctx.moveTo(0, 8 + (i * (h - 16)) / 3);
+      ctx.lineTo(w, 8 + (i * (h - 16)) / 3);
+      ctx.stroke();
     }
-    updateAction();
-    document.querySelectorAll("[data-chapter]").forEach((b) => {
-      const active = Number(b.dataset.chapter) === index;
-      b.classList.toggle("active", active);
-      b.setAttribute("aria-pressed", String(active));
+    ctx.strokeStyle = "#dce98e";
+    ctx.strokeRect(X(0) - 4, Y(0) - 4, 8, 8);
+    sites.forEach(([x, y], i) => {
+      ctx.beginPath();
+      ctx.arc(X(x), Y(y), state.collected.includes(i) ? 2 : 4, 0, Math.PI * 2);
+      ctx.fillStyle = state.collected.includes(i) ? "#607878" : "#dce98e";
+      ctx.fill();
     });
-  }
-  function updateAction() {
-    const done = completed.has(current),
-      button = document.getElementById("chapter-action");
-    button.textContent = done
-      ? "Запись сохранена ✓"
-      : chapters[current].action + " ↗";
-    button.disabled = done;
-    document.getElementById("action-status").textContent = done
-      ? chapters[current].result
-      : "";
-  }
-  function renderJournal() {
-    document.getElementById("journal-progress").textContent =
-      `ЗАПИСЕЙ: ${completed.size} / 5`;
-    const list = document.getElementById("journal-entries");
-    list.replaceChildren();
-    chapters.forEach((c, i) => {
-      const done = completed.has(i),
-        li = document.createElement("li");
-      li.className = done ? "" : "pending";
-      const num = document.createElement("span");
-      num.className = "mono";
-      num.textContent = `0${i + 1}`;
-      const body = document.createElement("div"),
-        h = document.createElement("h3");
-      h.textContent = c.name;
-      const p = document.createElement("p");
-      p.textContent = done ? c.note : "Эта остановка ещё ждёт твоего действия.";
-      body.append(h, p);
-      const status = document.createElement("span");
-      status.className = "status";
-      status.textContent = done ? "ЗАПИСАНО ✓" : "НЕ ПРОЙДЕНО";
-      li.append(num, body, status);
-      list.append(li);
+    hazards.forEach((o) => {
+      ctx.fillStyle = "#cb99bd";
+      ctx.fillRect(X(o.x) - 2, Y(o.g.position.y) - 2, 4, 4);
     });
-    document.getElementById("export-log").disabled = completed.size === 0;
-    if (!storageAvailable)
-      document.getElementById("journal-status").textContent =
-        "Хранилище недоступно. Записи доступны в этой вкладке; скачай журнал, чтобы сохранить их.";
+    ctx.beginPath();
+    ctx.arc(X(state.x), Y(state.y), 3.5, 0, Math.PI * 2);
+    ctx.fillStyle = "#fff";
+    ctx.fill();
   }
-  function persist() {
-    try {
-      localStorage.setItem(storageKey, JSON.stringify([...completed]));
-    } catch {
-      storageAvailable = false;
-    }
+  function update() {
+    document.getElementById("oxygen").textContent =
+      Math.ceil(state.oxygen) + "%";
+    document.getElementById("hull").textContent = Math.ceil(state.hull) + "%";
+    document.getElementById("oxygen-bar").value = state.oxygen;
+    document.getElementById("hull-bar").value = state.hull;
+    document.getElementById("samples").textContent =
+      state.collected.length + " / 5";
+    document.getElementById("depth").textContent =
+      Math.round(120 - state.y * 36) + " м";
+    document.getElementById("timer").textContent =
+      String(Math.floor(state.time / 60)).padStart(2, "0") +
+      ":" +
+      String(Math.floor(state.time % 60)).padStart(2, "0");
+    const target = sites.findIndex((_, i) => !state.collected.includes(i));
+    document.getElementById("phase").textContent =
+      target < 0 ? "ВОЗВРАЩАЙСЯ К ШЛЮЗУ" : "ОБРАЗЕЦ " + (target + 1) + " / 5";
+    document.getElementById("target-label").textContent =
+      target < 0
+        ? "Шлюз ← " + Math.round(Math.hypot(state.x, state.y)) + " м"
+        : names[target] +
+          " · " +
+          Math.round(
+            Math.hypot(sites[target][0] - state.x, sites[target][1] - state.y),
+          ) +
+          " м";
+    document.getElementById("sonar").disabled =
+      state.status !== "playing" || state.sonar > 0;
+    document.getElementById("sonar").innerHTML =
+      state.sonar > 0
+        ? "Сонар<br><small>" + Math.ceil(state.sonar) + " с</small>"
+        : "Сонар<br><small>−4% O₂</small>";
+    chart();
   }
-  function onScroll() {
-    if (app && innerWidth < 650) app.view([9, 5.5, 14], [0, 3.9, 0], 0);
-    else if (app) app.view([9, 4.5, 14], [0, 0, 0], 0);
-    const r = story.getBoundingClientRect();
-    progress = Math.max(0, Math.min(1, -r.top / (r.height - innerHeight)));
-    const index = Math.min(4, Math.floor(progress * 5));
-    renderChapter(index);
-    const depth =
-      index === 4
-        ? Math.round(2400 * (1 - (progress - 0.8) / 0.2))
-        : Math.round((progress / 0.8) * 2400);
-    document.getElementById("depth-value").textContent = String(
-      Math.max(0, depth),
-    ).padStart(4, "0");
-    document.getElementById("depth-fill").style.height = progress * 100 + "%";
-    document.getElementById("scroll-hint").textContent =
-      index === 4
-        ? "ПРОКРУТИ К ЖУРНАЛУ ЭКСПЕДИЦИИ ↓"
-        : "ПРОКРУТИ, ЧТОБЫ ПОГРУЗИТЬСЯ ↓";
-    renderScene();
+  function tell(text) {
+    document.getElementById("message").textContent = text;
   }
-  let scrollFrame = 0;
-  addEventListener(
-    "scroll",
-    () => {
-      if (!scrollFrame)
-        scrollFrame = requestAnimationFrame(() => {
-          scrollFrame = 0;
-          onScroll();
-        });
-    },
-    { passive: true },
-  );
-  addEventListener("resize", onScroll);
-  document.querySelectorAll("[data-chapter]").forEach((b) =>
-    b.addEventListener("click", () => {
-      const r = story.getBoundingClientRect(),
-        max = r.height - innerHeight;
-      scrollTo({
-        top: scrollY + r.top + ((Number(b.dataset.chapter) + 0.08) / 5) * max,
-        behavior: K.reduced ? "instant" : "smooth",
-      });
-    }),
-  );
-  document.getElementById("chapter-action").addEventListener("click", () => {
-    completed.add(current);
-    persist();
-    updateAction();
-    renderJournal();
-    renderScene();
-  });
-  document
-    .getElementById("export-log")
-    .addEventListener("click", () =>
-      K.download(
-        "abyss-expedition.txt",
-        "ABYSS — журнал вымышленной экспедиции\n\n" +
-          chapters
-            .map(
-              (c, i) =>
-                `${i + 1}. ${c.name}\n${completed.has(i) ? c.note : "Не пройдено."}`,
-            )
-            .join("\n\n") +
-          "\n\nХудожественная модель; маршрут, аппарат и наблюдения вымышлены.\n",
-        "text/plain;charset=utf-8",
-      ),
+  function finish(won) {
+    state.status = won ? "won" : "lost";
+    keys.clear();
+    document.getElementById("pause").disabled = true;
+    const gate = document.getElementById("gate");
+    gate.hidden = false;
+    gate.classList.add("ending");
+    gate.querySelector("h2").textContent = won
+      ? "Ты вернулся. С живым светом."
+      : "Глубина не прощает спешки.";
+    document.getElementById("gate-text").textContent = won
+      ? "Пять новых форм жизни. " +
+        Math.round(state.time) +
+        " секунд под водой. Повреждений: " +
+        state.hits +
+        ". Осталось кислорода: " +
+        Math.ceil(state.oxygen) +
+        "%."
+      : (state.oxygen <= 0
+          ? "Кислород закончился."
+          : "Корпус не выдержал столкновений.") +
+        " Найдено образцов: " +
+        state.collected.length +
+        " из 5. Смотри на карту и обходи розовые сигналы.";
+    document.getElementById("start").textContent = "Новый спуск →";
+    gate.querySelector(".gate-help").hidden = true;
+    update();
+  }
+  function step(dt) {
+    if (state.status !== "playing") return;
+    dt = Math.min(dt, 0.04);
+    state.time += dt;
+    state.sonar = Math.max(0, state.sonar - dt);
+    invulnerable = Math.max(0, invulnerable - dt);
+    const boosted = keys.has(" "),
+      speed = boosted ? 7 : 3.6;
+    let dx =
+        Number(keys.has("ArrowRight") || keys.has("d")) -
+        Number(keys.has("ArrowLeft") || keys.has("a")),
+      dy =
+        Number(keys.has("ArrowUp") || keys.has("w")) -
+        Number(keys.has("ArrowDown") || keys.has("s"));
+    const norm = Math.hypot(dx, dy) || 1;
+    state.x = Math.max(-1, Math.min(79, state.x + (dx / norm) * speed * dt));
+    state.y = Math.max(-12, Math.min(3, state.y + (dy / norm) * speed * dt));
+    state.oxygen = Math.max(
+      0,
+      state.oxygen - dt * (0.58 + (boosted && (dx || dy) ? 1.3 : 0)),
     );
-  document.getElementById("reset-log").addEventListener("click", () => {
-    completed.clear();
-    persist();
-    renderJournal();
-    updateAction();
-    renderScene();
-    document.getElementById("journal-status").textContent = storageAvailable
-      ? "Журнал очищен. Можно пройти маршрут заново."
-      : "Журнал очищен в этой вкладке. Хранилище недоступно.";
+    if (boosted) state.boost += dt;
+    sonarRing.visible = state.sonar > 7;
+    sonarRing.position.set(state.x, state.y, 0);
+    sonarRing.scale.setScalar(1 + (10 - state.sonar) * 5);
+    sonarRing.material.opacity = Math.max(0, (state.sonar - 7) / 3) * 0.65;
+    for (const g of sub.children)
+      if (g.isGroup && g.position.x === -2.44)
+        g.rotation.x += dt * (boosted ? 22 : 12);
+    sub.position.set(state.x, state.y, 0);
+    sub.rotation.z += (dy * 0.13 - sub.rotation.z) * Math.min(1, dt * 8);
+    sub.rotation.y +=
+      (dx < 0 ? Math.PI - sub.rotation.y : -sub.rotation.y) *
+      Math.min(1, dt * 7);
+    hazards.forEach((o, i) => {
+      o.g.position.y = o.y + Math.sin(state.time * 0.65 + i) * 0.75;
+      if (
+        !invulnerable &&
+        Math.hypot(state.x - o.x, state.y - o.g.position.y) < 1.35
+      ) {
+        state.hull = Math.max(0, state.hull - 18);
+        state.hits++;
+        invulnerable = 2;
+        tell("Разряд медузы. Корпус −18%. Обойди розовый сигнал.");
+      }
+    });
+    objects.forEach((g, i) => {
+      g.rotation.y += dt * 0.8;
+      g.rotation.z = Math.sin(state.time + i) * 0.12;
+      g.scale.setScalar(state.sonar > 7 ? 1.3 : 1);
+      if (
+        !state.collected.includes(i) &&
+        Math.hypot(state.x - sites[i][0], state.y - sites[i][1]) < 1.8
+      ) {
+        state.collected.push(i);
+        g.visible = false;
+        state.oxygen = Math.min(100, state.oxygen + 4);
+        tell(
+          "Образец «" +
+            names[i] +
+            "» в контейнере. " +
+            (state.collected.length === 5
+              ? "Теперь вернись в шлюз слева."
+              : "Ищи следующий огонёк."),
+        );
+      }
+    });
+    if (state.oxygen <= 0 || state.hull <= 0) finish(false);
+    else if (state.collected.length === 5 && Math.hypot(state.x, state.y) < 2)
+      finish(true);
+    const off = innerWidth < 700 ? [5, 5.5, 16] : [7, 5, 18];
+    app.camera.position.set(state.x + off[0], state.y + off[1], off[2]);
+    app.target.set(state.x + 2, state.y - 1, 0);
+    app.invalidate();
+    update();
+  }
+  function loop(now) {
+    raf = 0;
+    if (state.status !== "playing") return;
+    step(last ? (now - last) / 1000 : 0);
+    last = now;
+    if (state.status === "playing") raf = requestAnimationFrame(loop);
+  }
+  function start() {
+    if (!app) return;
+    cancelAnimationFrame(raf);
+    state = origin();
+    state.status = "playing";
+    keys.clear();
+    invulnerable = 0;
+    objects.forEach((g) => (g.visible = true));
+    document.getElementById("gate").hidden = true;
+    document.getElementById("gate").classList.remove("ending");
+    document.getElementById("pause").disabled = false;
+    document.getElementById("pause").textContent = "Пауза";
+    document.body.classList.remove("paused");
+    tell("Держи курс на бело-зелёные сигналы.");
+    last = 0;
+    raf = requestAnimationFrame(loop);
+    canvas.focus({ preventScroll: true });
+    update();
+  }
+  function pause() {
+    if (state.status === "playing") {
+      state.status = "paused";
+      cancelAnimationFrame(raf);
+      keys.clear();
+      document.getElementById("pause").textContent = "Продолжить";
+      document.body.classList.add("paused");
+    } else if (state.status === "paused") {
+      state.status = "playing";
+      last = 0;
+      raf = requestAnimationFrame(loop);
+      document.getElementById("pause").textContent = "Пауза";
+      document.body.classList.remove("paused");
+    }
+    update();
+  }
+  document.getElementById("start").onclick = start;
+  document.getElementById("pause").onclick = pause;
+  document.getElementById("sonar").onclick = () => {
+    if (state.status !== "playing" || state.sonar > 0) return;
+    if (state.oxygen <= 4) {
+      tell("Не хватает кислорода для сонара.");
+      return;
+    }
+    state.oxygen -= 4;
+    state.sonar = 10;
+    tell("Сигналы подсвечены. Зелёные — образцы, розовые — медузы.");
+    update();
+  };
+  const allowed = [
+    "ArrowLeft",
+    "ArrowRight",
+    "ArrowUp",
+    "ArrowDown",
+    "w",
+    "a",
+    "s",
+    "d",
+    " ",
+  ];
+  window.addEventListener("keydown", (e) => {
+    const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+    if (allowed.includes(key) && ["playing", "paused"].includes(state.status)) {
+      e.preventDefault();
+      if (state.status === "playing") keys.add(key);
+    }
+    if (!e.repeat && key === "p") pause();
+    if (!e.repeat && key === "e") document.getElementById("sonar").click();
   });
-  onScroll();
-  renderJournal();
-  window.abyss = {
-    get current() {
-      return current;
-    },
-    get completed() {
-      return [...completed];
+  window.addEventListener("keyup", (e) =>
+    keys.delete(e.key.length === 1 ? e.key.toLowerCase() : e.key),
+  );
+  document.querySelectorAll("[data-key]").forEach((b) => {
+    b.addEventListener("pointerdown", (e) => {
+      if (state.status !== "playing") return;
+      e.preventDefault();
+      b.setPointerCapture(e.pointerId);
+      keys.add(b.dataset.key);
+      b.classList.add("pressed");
+    });
+    ["pointerup", "pointercancel", "lostpointercapture"].forEach((name) =>
+      b.addEventListener(name, () => {
+        keys.delete(b.dataset.key);
+        b.classList.remove("pressed");
+      }),
+    );
+  });
+  window.addEventListener("blur", () => {
+    if (state.status === "playing") pause();
+  });
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden && state.status === "playing") pause();
+  });
+  window.addEventListener("resize", chart);
+  update();
+  canvas.addEventListener("webglcontextlost", () => {
+    if (state.status === "playing") pause();
+  });
+  window.deepRun = {
+    get state() {
+      return structuredClone(state);
     },
     app,
-    onScroll,
+    sites,
+    step,
+    pause,
   };
 })();
